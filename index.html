@@ -1,86 +1,370 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    body {background-color: #f6f7f9}
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #0000e9; -webkit-text-stroke: #0000e9}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'PingFang TC'; color: #000000; color: rgba(0, 0, 0, 0.85); -webkit-text-stroke: rgba(0, 0, 0, 0.85)}
-    p.p5 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'PingFang TC'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e}
-    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e; min-height: 14.0px}
-    p.p9 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e}
-    p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'PingFang TC'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e}
-    span.s1 {text-decoration: underline ; font-kerning: none}
-    span.s2 {font-kerning: none}
-    span.s3 {font-kerning: none; background-color: #b3b3b3}
-    span.s4 {font: 18.0px 'PingFang TC'; font-kerning: none}
-    span.s5 {font: 12.0px 'Helvetica Neue'; font-kerning: none}
-    span.s6 {font: 12.0px 'PingFang TC'; font-kerning: none}
-    span.s7 {font: 14.0px 'PingFang TC'; font-kerning: none}
-    span.s8 {font: 14.0px 'Helvetica Neue'; font-kerning: none}
-    span.s9 {font: 11.0px 'Helvetica Neue'; font-kerning: none; background-color: #b3b3b3}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>賴姵璇 | 個人首頁</title>
+
+    <!-- Google Analytics GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-3G0FTDEHC4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-3G0FTDEHC4');
+    </script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+            background-color: #e6ecf5;
+            color: #4a5568;
+        }
+
+        /* Neumorphism Flat Extruded Surface */
+        .neu-card {
+            background: #e6ecf5;
+            box-shadow: 9px 9px 18px #c5d0e0, -9px -9px 18px #ffffff;
+            border-radius: 20px;
+        }
+
+        /* Small Neumorphic Card / Tag */
+        .neu-card-sm {
+            background: #e6ecf5;
+            box-shadow: 5px 5px 10px #c5d0e0, -5px -5px 10px #ffffff;
+            border-radius: 14px;
+        }
+
+        /* Neumorphic Inset / Recessed Effect */
+        .neu-inset {
+            background: #e6ecf5;
+            box-shadow: inset 4px 4px 8px #c5d0e0, inset -4px -4px 8px #ffffff;
+            border-radius: 12px;
+        }
+
+        /* Interactive Neumorphic Button */
+        .neu-btn {
+            background: #e6ecf5;
+            box-shadow: 6px 6px 12px #c5d0e0, -6px -6px 12px #ffffff;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .neu-btn:hover {
+            box-shadow: 3px 3px 6px #c5d0e0, -3px -3px 6px #ffffff;
+            transform: translateY(1px);
+        }
+
+        .neu-btn:active {
+            box-shadow: inset 4px 4px 8px #c5d0e0, inset -4px -4px 8px #ffffff;
+            transform: translateY(2px);
+        }
+
+        /* Accent Primary Button */
+        .neu-btn-primary {
+            background: linear-gradient(145deg, #4f80e1, #426cc0);
+            box-shadow: 6px 6px 14px #b8c6dc, -6px -6px 14px #ffffff;
+            color: #ffffff;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .neu-btn-primary:hover {
+            background: linear-gradient(145deg, #426cc0, #4f80e1);
+            box-shadow: 3px 3px 8px #b8c6dc, -3px -3px 8px #ffffff;
+        }
+
+        .neu-btn-primary:active {
+            box-shadow: inset 3px 3px 6px #2e4b86, inset -3px -3px 6px #5c93ff;
+        }
+
+        /* Soft Geometric Initials Badge */
+        .neu-initials-badge {
+            background: #e6ecf5;
+            box-shadow: 10px 10px 20px #c5d0e0, -10px -10px 20px #ffffff;
+            border-radius: 28px;
+        }
+
+        /* Modal Backdrop Blur */
+        .modal-backdrop {
+            background-color: rgba(230, 236, 245, 0.85);
+            backdrop-filter: blur(8px);
+        }
+    </style>
 </head>
-<body>
-<p class="p1"><span class="s1">LAI PEI-XUAN</span></p>
-<p class="p1"><span class="s1">01. HOME</span></p>
-<p class="p2"><span class="s2">02. NEWS SOON</span></p>
-<p class="p2"><span class="s2">03. TOOLS SOON</span></p>
-<p class="p2"><span class="s2">04. GAMES SOON</span></p>
-<p class="p3"><span class="s3">聯絡我</span></p>
-<p class="p1"><span class="s1">01. HOME</span></p>
-<p class="p2"><span class="s2">02. NEWS COMING SOON</span></p>
-<p class="p2"><span class="s2">03. TOOLS COMING SOON</span></p>
-<p class="p2"><span class="s2">04. GAMES COMING SOON</span></p>
-<p class="p3"><span class="s3">聯絡我</span></p>
-<p class="p2"><span class="s2">TATUNG UNIVERSITY / BM DEPT</span></p>
-<h1 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s4"><b>賴姵璇</b><b></b></span></h1>
-<p class="p5"><span class="s2">大同大學事業經營學系學生</span><span class="s5"> / </span><span class="s2">行政與禮賓服務專員</span></p>
-<p class="p2"><span class="s2">EDUCATION </span><span class="s6">事業經營學系</span><span class="s2"> (2023 - 2027)</span></p>
-<p class="p2"><span class="s2">LOCATION </span><span class="s6">台北</span><span class="s2">, </span><span class="s6">台灣</span></p>
-<p class="p6"><span class="s2"></span><br></p>
-<p class="p2"><span class="s2">PORTRAIT / </span><span class="s6">賴姵璇</span></p>
-<p class="p6"><span class="s2"></span><br></p>
-<p class="p2"><span class="s2">// 01. BIOGRAPHY</span></p>
-<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s4"><b>個人簡介</b><b></b></span></h2>
-<p class="p6"><span class="s2"></span><br></p>
-<p class="p5"><span class="s2">賴姵璇，目前就讀大同大學事業經營學系，自</span><span class="s5">2023</span><span class="s2">年入學，預計於</span><span class="s5">2027</span><span class="s2">年</span><span class="s5">7</span><span class="s2">月畢業。曾於建設公司擔任接待禮賓人員，也曾在補習班擔任櫃檯。暑期曾至地政業實習，主要接觸行政與文書處理。平時使用</span><span class="s5">Word</span><span class="s2">、</span><span class="s5">Canva</span><span class="s2">及</span><span class="s5">PowerPoint</span><span class="s2">處理課業與工作內容。個性樂觀、懂得變通，也重視細節。課餘時間喜歡跑步，作為日常生活中的興趣。</span></p>
-<p class="p2"><span class="s2">// 02. SPECIALTIES</span></p>
-<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s4"><b>專長與工具</b><b></b></span></h2>
-<p class="p2"><span class="s2">TOOL 01</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s2"><b>Word</b></span></h3>
-<p class="p5"><span class="s2">文書處理與報告撰寫</span></p>
-<p class="p2"><span class="s2">TOOL 02</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s2"><b>Canva</b></span></h3>
-<p class="p5"><span class="s2">視覺設計與簡報製作</span></p>
-<p class="p2"><span class="s2">TOOL 03</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s2"><b>PowerPoint</b></span></h3>
-<p class="p5"><span class="s2">簡報架構與展示</span></p>
-<p class="p2"><span class="s2">CORE 01</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s7"><b>行政文書處理</b><b></b></span></h3>
-<p class="p5"><span class="s2">地政與補習班行政經驗</span></p>
-<p class="p2"><span class="s2">CORE 02</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s7"><b>禮賓接待</b><b></b></span></h3>
-<p class="p5"><span class="s2">建設公司接待禮賓與櫃檯服務經歷</span></p>
-<p class="p2"><span class="s2">CONTACT ME</span></p>
-<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px 'PingFang TC Semibold'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s4"><b>有合作需求或相關疑問？</b><b></b></span></h2>
-<p class="p5"><span class="s2">歡迎隨時發送訊息聯繫賴姵璇。</span></p>
-<p class="p3"><span class="s3">立即聯絡</span></p>
-<p class="p2"><span class="s2">LAI PEI-XUAN</span></p>
-<p class="p5"><span class="s2">大同大學事業經營學系（</span><span class="s5">2023 - 2027</span><span class="s2">）</span></p>
-<p class="p9"><span class="s2">DESIGN STYLE: SWISS STYLE / FLAT DESIGN</span></p>
-<p class="p9"><span class="s2">© 2026 </span><span class="s6">賴姵璇</span><span class="s2"> ALL RIGHTS RESERVED.</span></p>
-<p class="p9"><span class="s2">GA ID: G-3G0FTDEHC4</span></p>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px 'PingFang TC'; color: #0e0e0e; -webkit-text-stroke: #0e0e0e"><span class="s2"><b>發送訊息</b></span><span class="s8"><b> / </b></span><span class="s2"><b>聯絡我</b><b></b></span></h3>
-<p class="p2"><span class="s2">01. </span><span class="s6">您的姓名</span><span class="s2"> *</span></p>
-<p class="p2"><span class="s2">02. </span><span class="s6">電子郵件</span><span class="s2"> *</span></p>
-<p class="p2"><span class="s2">03. </span><span class="s6">訊息內容</span><span class="s2"> *</span></p>
-<p class="p3"><span class="s3">確</span><span class="s9"> </span><span class="s3">認</span><span class="s9"> </span><span class="s3">送</span><span class="s9"> </span><span class="s3">出</span></p>
-<p class="p11"><span class="s2">訊息已傳送！謝謝您的聯繫。</span></p>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+    <header class="sticky top-0 z-40 bg-[#e6ecf5]/90 backdrop-blur-md px-4 py-4 md:px-8">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <a href="#home" class="font-bold text-lg text-slate-700 tracking-wider flex items-center gap-2 px-3 py-2 neu-card-sm">
+                <i class="fa-solid fa-graduation-cap text-blue-500"></i>
+                <span>賴姵璇</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center space-x-4 text-sm font-medium">
+                <a href="#home" class="px-4 py-2 neu-btn text-slate-700 hover:text-blue-600">Home</a>
+                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
+                    News <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
+                </span>
+                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
+                    Tools <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
+                </span>
+                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
+                    Games <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
+                </span>
+            </nav>
+
+            <button onclick="toggleContactModal()" class="px-4 py-2 neu-btn-primary font-medium text-sm flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-xs"></i> 聯絡我
+            </button>
+        </div>
+
+        <!-- Mobile Navigation Bar -->
+        <div class="flex md:hidden justify-center gap-2 mt-3 pt-2 border-t border-slate-300/40 text-xs">
+            <a href="#home" class="px-3 py-1.5 neu-btn text-slate-700">Home</a>
+            <span class="px-2.5 py-1.5 neu-inset text-slate-400">News <span class="text-[9px] opacity-75">Soon</span></span>
+            <span class="px-2.5 py-1.5 neu-inset text-slate-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
+            <span class="px-2.5 py-1.5 neu-inset text-slate-400">Games <span class="text-[9px] opacity-75">Soon</span></span>
+        </div>
+    </header>
+
+    <main id="home" class="max-w-5xl mx-auto px-4 py-8 md:py-12 flex-grow space-y-12">
+
+        <!-- Hero Section -->
+        <section class="neu-card p-6 md:p-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <!-- Non-Photo Initial Monogram Badge -->
+            <div class="flex-shrink-0">
+                <div class="neu-initials-badge w-36 h-36 md:w-44 md:h-44 flex flex-col items-center justify-center border border-white/40">
+                    <span class="text-4xl md:text-5xl font-extrabold text-blue-500 tracking-wider">賴</span>
+                    <span class="text-xs font-semibold text-slate-400 mt-1 tracking-widest uppercase">P.H. LAI</span>
+                </div>
+            </div>
+
+            <!-- Identity Info -->
+            <div class="flex-grow text-center md:text-left space-y-4">
+                <div class="inline-block px-3 py-1 neu-inset text-xs font-semibold text-blue-600 tracking-wider">
+                    PERSONAL PROFILE
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
+                    賴姵璇
+                </h1>
+                <p class="text-base md:text-lg text-slate-600 font-medium leading-relaxed">
+                    大同大學事業經營學系學生，專注於行政文書處理與顧客服務接待。
+                </p>
+                <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
+                    <button onclick="toggleContactModal()" class="px-6 py-2.5 neu-btn-primary font-medium text-sm flex items-center gap-2">
+                        <i class="fa-regular fa-envelope"></i> 立即聯絡
+                    </button>
+                    <a href="#about" class="px-5 py-2.5 neu-btn font-medium text-sm text-slate-700">
+                        了解更多
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-8 bg-blue-500 rounded-full neu-card-sm"></div>
+                <h2 class="text-xl font-bold text-slate-800">關於我</h2>
+            </div>
+            
+            <div class="neu-card p-6 md:p-8">
+                <!-- Exact Traditional Chinese Biography Text (137 Characters) -->
+                <p class="text-slate-700 leading-relaxed text-base md:text-lg tracking-wide">
+                    賴姵璇，目前就讀大同大學事業經營學系，自2023年入學，預計於2027年7月畢業。曾於建設公司擔任接待禮賓人員，也曾在補習班擔任櫃檯。暑期曾至地政業實習，主要接觸行政與文書處理。平時使用Word、Canva及PowerPoint處理課業與工作內容。個性樂觀、懂得變通，也重視細節。課餘時間喜歡跑步，作為日常生活中的興趣。
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-8 bg-blue-500 rounded-full neu-card-sm"></div>
+                <h2 class="text-xl font-bold text-slate-800">專長與工具</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Tool 1 -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-blue-600 rounded-xl">
+                        <i class="fa-solid fa-file-word text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Microsoft Word</h3>
+                        <p class="text-xs text-slate-500 mt-1">課業報告與行政文書編輯處理</p>
+                    </div>
+                </div>
+
+                <!-- Tool 2 -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-indigo-500 rounded-xl">
+                        <i class="fa-solid fa-palette text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Canva</h3>
+                        <p class="text-xs text-slate-500 mt-1">視覺文宣設計與簡報編排</p>
+                    </div>
+                </div>
+
+                <!-- Tool 3 -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-orange-500 rounded-xl">
+                        <i class="fa-solid fa-file-powerpoint text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">PowerPoint</h3>
+                        <p class="text-xs text-slate-500 mt-1">簡報製作與課程專題展示</p>
+                    </div>
+                </div>
+
+                <!-- Competency 1 -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-emerald-500 rounded-xl">
+                        <i class="fa-solid fa-folder-open text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">行政與文書處理</h3>
+                        <p class="text-xs text-slate-500 mt-1">地政實習與補習班櫃檯實務</p>
+                    </div>
+                </div>
+
+                <!-- Competency 2 -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-sky-500 rounded-xl">
+                        <i class="fa-solid fa-bell-concierge text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">接待與禮賓服務</h3>
+                        <p class="text-xs text-slate-500 mt-1">建設公司接待與客戶服務</p>
+                    </div>
+                </div>
+
+                <!-- Personal Interest -->
+                <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
+                    <div class="p-3 neu-inset text-rose-500 rounded-xl">
+                        <i class="fa-solid fa-person-running text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">課餘興趣</h3>
+                        <p class="text-xs text-slate-500 mt-1">規律跑步，保持樂觀與專注細節</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Primary CTA Card -->
+        <section class="neu-card p-8 text-center space-y-4">
+            <h3 class="text-2xl font-bold text-slate-800">準備好進行交流或合作了嗎？</h3>
+            <p class="text-slate-600 text-sm md:text-base max-w-xl mx-auto">
+                如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，歡迎隨時與我聯繫。
+            </p>
+            <div class="pt-2">
+                <button onclick="toggleContactModal()" class="px-8 py-3 neu-btn-primary font-bold text-base inline-flex items-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> 聯絡我
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-12 border-t border-slate-300/40 py-8 px-4 text-center">
+        <div class="max-w-5xl mx-auto space-y-4">
+            <div class="flex justify-center items-center gap-4 text-sm text-slate-600">
+                <span class="neu-card-sm px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-blue-500"></i> 大同大學事業經營學系
+                </span>
+                <span class="neu-card-sm px-3 py-1.5 flex items-center gap-2">
+                    <i class="fa-solid fa-person-running text-emerald-500"></i> 樂觀・變通・注重細節
+                </span>
+            </div>
+            <p class="text-xs text-slate-500 pt-2">
+                &copy; 賴姵璇. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Interactive Neumorphic Contact Modal -->
+    <div id="contactModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="neu-card w-full max-w-md p-6 md:p-8 relative space-y-6">
+            <!-- Close Button -->
+            <button onclick="toggleContactModal()" class="absolute top-4 right-4 w-9 h-9 neu-btn flex items-center justify-center text-slate-500 hover:text-slate-800">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 neu-inset mx-auto flex items-center justify-center text-blue-500 rounded-full">
+                    <i class="fa-solid fa-envelope-open-text text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">聯絡賴姵璇</h3>
+                <p class="text-xs text-slate-500">請填寫訊息，我將會在收到後盡快回覆您。</p>
+            </div>
+
+            <!-- Contact Form -->
+            <form onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div class="space-y-1 text-left">
+                    <label class="text-xs font-semibold text-slate-600 ml-1">您的姓名</label>
+                    <input type="text" required placeholder="請輸入姓名" class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none">
+                </div>
+
+                <div class="space-y-1 text-left">
+                    <label class="text-xs font-semibold text-slate-600 ml-1">電子郵件</label>
+                    <input type="email" required placeholder="example@email.com" class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none">
+                </div>
+
+                <div class="space-y-1 text-left">
+                    <label class="text-xs font-semibold text-slate-600 ml-1">訊息內容</label>
+                    <textarea rows="3" required placeholder="請輸入您想交流的事項..." class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-3 neu-btn-primary font-bold text-sm mt-2">
+                    發送訊息
+                </button>
+            </form>
+
+            <div id="formFeedback" class="hidden p-3 neu-inset text-center text-xs text-emerald-600 font-medium">
+                <i class="fa-solid fa-circle-check mr-1"></i> 訊息已成功發送！謝謝您的聯絡。
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Toggle Script -->
+    <script>
+        function toggleContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.toggle('hidden');
+            
+            if(modal.classList.contains('hidden')) {
+                document.getElementById('formFeedback').classList.add('hidden');
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const feedback = document.getElementById('formFeedback');
+            feedback.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toggleContactModal();
+                event.target.reset();
+            }, 2000);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('contactModal');
+            if (event.target === modal) {
+                toggleContactModal();
+            }
+        }
+    </script>
 </body>
 </html>
