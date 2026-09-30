@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>賴姵璇 | 個人首頁</title>
+    <title>賴姵璇 | 首頁</title>
 
     <!-- Google Analytics GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-3G0FTDEHC4"></script>
@@ -89,6 +89,21 @@
             box-shadow: inset 3px 3px 6px #2e4b86, inset -3px -3px 6px #5c93ff;
         }
 
+        /* Accent Game Button (Purple/Pink Gradient for game call) */
+        .neu-btn-game {
+            background: linear-gradient(145deg, #8b5cf6, #ec4899);
+            box-shadow: 6px 6px 14px #b8c6dc, -6px -6px 14px #ffffff;
+            color: #ffffff;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .neu-btn-game:hover {
+            background: linear-gradient(145deg, #ec4899, #8b5cf6);
+            box-shadow: 3px 3px 8px #b8c6dc, -3px -3px 8px #ffffff;
+            transform: translateY(-1px);
+        }
+
         /* Soft Geometric Initials Badge */
         .neu-initials-badge {
             background: #e6ecf5;
@@ -120,9 +135,9 @@
                 <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
                     Tools <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
-                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
-                    Games <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
-                </span>
+                <a href="game.html" class="px-4 py-2 neu-btn text-purple-600 hover:text-pink-600 font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-gamepad text-purple-500"></i> Games
+                </a>
             </nav>
 
             <button onclick="toggleContactModal()" class="px-4 py-2 neu-btn-primary font-medium text-sm flex items-center gap-2">
@@ -135,7 +150,9 @@
             <a href="#home" class="px-3 py-1.5 neu-btn text-slate-700">Home</a>
             <span class="px-2.5 py-1.5 neu-inset text-slate-400">News <span class="text-[9px] opacity-75">Soon</span></span>
             <span class="px-2.5 py-1.5 neu-inset text-slate-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
-            <span class="px-2.5 py-1.5 neu-inset text-slate-400">Games <span class="text-[9px] opacity-75">Soon</span></span>
+            <a href="game.html" class="px-3 py-1.5 neu-btn text-purple-600 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-gamepad"></i> Games
+            </a>
         </div>
     </header>
 
@@ -160,9 +177,12 @@
                     賴姵璇
                 </h1>
                 <p class="text-base md:text-lg text-slate-600 font-medium leading-relaxed">
-                    大同大學事業經營學系學生，專注於行政文書處理與顧客服務接待。
+                    大同大學事業經營學系 學生，專注於行政文書處理與顧客服務接待。
                 </p>
                 <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
+                    <a href="game.html" class="px-6 py-2.5 neu-btn-game font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-base"></i> 玩我的小遊戲
+                    </a>
                     <button onclick="toggleContactModal()" class="px-6 py-2.5 neu-btn-primary font-medium text-sm flex items-center gap-2">
                         <i class="fa-regular fa-envelope"></i> 立即聯絡
                     </button>
@@ -266,9 +286,12 @@
         <section class="neu-card p-8 text-center space-y-4">
             <h3 class="text-2xl font-bold text-slate-800">準備好進行交流或合作了嗎？</h3>
             <p class="text-slate-600 text-sm md:text-base max-w-xl mx-auto">
-                如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，歡迎隨時與我聯繫。
+                如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，或是想放鬆放鬆體驗遊戲，都歡迎與我聯繫或試玩！
             </p>
-            <div class="pt-2">
+            <div class="pt-2 flex flex-wrap justify-center gap-4">
+                <a href="game.html" class="px-8 py-3 neu-btn-game font-bold text-base inline-flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad"></i> 玩我的小遊戲
+                </a>
                 <button onclick="toggleContactModal()" class="px-8 py-3 neu-btn-primary font-bold text-base inline-flex items-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> 聯絡我
                 </button>
