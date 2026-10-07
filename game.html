@@ -136,7 +136,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 12, 27, 0.85);
+            background: rgba(15, 12, 27, 0.88);
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
@@ -144,6 +144,7 @@
             align-items: center;
             z-index: 10;
             transition: opacity 0.3s ease;
+            padding: 20px;
         }
 
         .overlay.hidden {
@@ -161,8 +162,30 @@
         .overlay-msg {
             font-size: 16px;
             color: #ddd;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 80%;
+            max-width: 280px;
+        }
+
+        .input-name {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--neon-cyan);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-align: center;
+            font-size: 14px;
+            outline: none;
+            user-select: auto;
+            -webkit-user-select: auto;
         }
 
         .btn-restart {
@@ -182,6 +205,59 @@
             transform: scale(0.95);
             box-shadow: 0 0 5px var(--neon-pink);
         }
+
+        .btn-submit {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000;
+            background: var(--neon-cyan);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0 10px var(--neon-cyan);
+            cursor: pointer;
+        }
+
+        /* 雲端排行榜樣式 */
+        .leaderboard-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .leaderboard-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard-item:nth-child(1) { color: #ffe600; font-weight: bold; }
+        .leaderboard-item:nth-child(2) { color: #e0e0e0; font-weight: bold; }
+        .leaderboard-item:nth-child(3) { color: #cd7f32; font-weight: bold; }
 
         /* 手機觸控操作區 */
         .controls {
@@ -237,7 +313,6 @@
             color: #000;
         }
 
-        /* 提示資訊 */
         .hint {
             font-size: 11px;
             color: #666;
@@ -274,6 +349,14 @@
         <div id="gameOverOverlay" class="overlay hidden">
             <div class="overlay-title">遊戲結束</div>
             <div id="finalScoreMsg" class="overlay-msg">得分：0</div>
+            
+            <!-- 上傳雲端排行榜區塊 -->
+            <div class="input-group">
+                <input type="text" id="playerName" class="input-name" placeholder="輸入玩家暱稱" maxlength="10">
+                <button id="btnSubmitScore" class="btn-submit" onclick="submitScore()">上傳</button>
+            </div>
+            <div id="uploadStatus" style="font-size: 12px; color: var(--neon-yellow); margin-bottom: 12px;"></div>
+
             <button class="btn-restart" onclick="resetGame()">重新開始</button>
         </div>
 
@@ -283,6 +366,14 @@
             <div class="overlay-msg">請點擊下方按鈕或按下空白鍵開始</div>
             <button class="btn-restart" onclick="startGame()">開始遊戲</button>
         </div>
+    </div>
+
+    <!-- 雲端排行榜 -->
+    <div class="leaderboard-card">
+        <div class="leaderboard-header">🏆 雲端 TOP 10 排行榜</div>
+        <ul id="leaderboardList" class="leaderboard-list">
+            <li class="leaderboard-item" style="justify-content:center; color:#888;">載入中...</li>
+        </ul>
     </div>
 
     <!-- 手機觸控操作盤 -->
@@ -303,12 +394,13 @@
     <div class="hint">電腦操控：鍵盤 [←] [→] [↑] [↓] 方向鍵移動，[空白鍵] 暫停</div>
 
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycby5K02qWO5at_p8Wes52DdDgkzb-5s1bg0gbMTyA2hrwVtcwPdnxVsQXWm0X6iLwKr_/exec";
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // 遊戲參數設定
-        const gridSize = 20; // 20x20 格子
-        const tileSize = canvas.width / gridSize; // 每格像素 20px
+        const gridSize = 20; 
+        const tileSize = canvas.width / gridSize; 
 
         let snake = [];
         let food = { x: 0, y: 0 };
@@ -324,9 +416,8 @@
         let gameLoop = null;
         let isRunning = false;
         let isPaused = false;
-        let speed = 130; // 毫秒/幀
+        let speed = 130; 
 
-        // 初始化遊戲 state
         function initGame() {
             snake = [
                 { x: 5 * tileSize, y: 10 * tileSize },
@@ -339,15 +430,15 @@
             nextDy = 0;
             score = 0;
             document.getElementById('score').innerText = score;
+            document.getElementById('uploadStatus').innerText = '';
+            document.getElementById('btnSubmitScore').disabled = false;
             spawnFood();
         }
 
-        // 隨機生成食物
         function spawnFood() {
             food.x = Math.floor(Math.random() * gridSize) * tileSize;
             food.y = Math.floor(Math.random() * gridSize) * tileSize;
 
-            // 確保食物不會生在蛇身上
             snake.forEach(part => {
                 if (part.x === food.x && part.y === food.y) {
                     spawnFood();
@@ -355,7 +446,6 @@
             });
         }
 
-        // 開始遊戲
         function startGame() {
             document.getElementById('startOverlay').classList.add('hidden');
             document.getElementById('gameOverOverlay').classList.add('hidden');
@@ -366,12 +456,10 @@
             gameLoop = setInterval(update, speed);
         }
 
-        // 重新開始
         function resetGame() {
             startGame();
         }
 
-        // 暫停與繼續
         function togglePause() {
             if (!isRunning) {
                 startGame();
@@ -385,22 +473,18 @@
             }
         }
 
-        // 遊戲核心邏輯更新
         function update() {
             if (isPaused) return;
 
             dx = nextDx;
             dy = nextDy;
 
-            // 新蛇頭位置
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // 碰撞牆壁檢查
             if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
                 return gameOver();
             }
 
-            // 碰撞自己身體檢查
             for (let i = 0; i < snake.length; i++) {
                 if (snake[i].x === head.x && snake[i].y === head.y) {
                     return gameOver();
@@ -409,7 +493,6 @@
 
             snake.unshift(head);
 
-            // 吃食物檢查
             if (head.x === food.x && head.y === food.y) {
                 score += 10;
                 document.getElementById('score').innerText = score;
@@ -428,13 +511,10 @@
             draw();
         }
 
-        // 繪製畫面
         function draw() {
-            // 背景清空
             ctx.fillStyle = '#0a0814';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 繪製微弱網格
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
             for (let i = 0; i < canvas.width; i += tileSize) {
                 ctx.beginPath();
@@ -443,7 +523,6 @@
                 ctx.stroke();
             }
 
-            // 繪製可愛霓虹食物 (水果草莓感)
             ctx.shadowBlur = 12;
             ctx.shadowColor = '#ffe600';
             ctx.fillStyle = '#ffe600';
@@ -451,24 +530,19 @@
             ctx.arc(food.x + tileSize / 2, food.y + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
             ctx.fill();
 
-            // 繪製貪食蛇 (Kawaii + Neon Glow)
             snake.forEach((part, index) => {
                 if (index === 0) {
-                    // 蛇頭：亮粉霓虹色
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = '#ff2a85';
                     ctx.fillStyle = '#ff2a85';
 
-                    // 圓角矩形蛇頭
                     ctx.beginPath();
                     ctx.roundRect(part.x + 1, part.y + 1, tileSize - 2, tileSize - 2, 8);
                     ctx.fill();
 
-                    // 可愛眼睛
                     ctx.shadowBlur = 0;
                     ctx.fillStyle = '#ffffff';
 
-                    // 依據方向稍微調整眼珠位置
                     let eyeX1 = part.x + 5, eyeY1 = part.y + 5;
                     let eyeX2 = part.x + 13, eyeY2 = part.y + 5;
 
@@ -481,7 +555,6 @@
                     ctx.arc(eyeX2, eyeY2, 2.5, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // 身體：漸層紫色/青色
                     ctx.shadowBlur = 8;
                     ctx.shadowColor = '#00f0ff';
                     ctx.fillStyle = index % 2 === 0 ? '#00f0ff' : '#9d4edd';
@@ -492,10 +565,9 @@
                 }
             });
 
-            ctx.shadowBlur = 0; // 重設陰影
+            ctx.shadowBlur = 0;
         }
 
-        // 遊戲結束
         function gameOver() {
             clearInterval(gameLoop);
             isRunning = false;
@@ -503,7 +575,6 @@
             document.getElementById('gameOverOverlay').classList.remove('hidden');
         }
 
-        // 控制方向判斷
         function handleDirection(dir) {
             if (dir === 'LEFT' && dx === 0) { nextDx = -tileSize; nextDy = 0; }
             else if (dir === 'UP' && dy === 0) { nextDx = 0; nextDy = -tileSize; }
@@ -511,8 +582,8 @@
             else if (dir === 'DOWN' && dy === 0) { nextDx = 0; nextDy = tileSize; }
         }
 
-        // 鍵盤監聽事件
         window.addEventListener('keydown', e => {
+            if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
             if (e.key === 'ArrowLeft') handleDirection('LEFT');
             else if (e.key === 'ArrowUp') handleDirection('UP');
             else if (e.key === 'ArrowRight') handleDirection('RIGHT');
@@ -523,8 +594,86 @@
             }
         });
 
-        // 初始化靜態繪製畫面
+        // 讀取排行榜
+        async function fetchLeaderboard() {
+            const listEl = document.getElementById('leaderboardList');
+            try {
+                const response = await fetch(API_URL, { redirect: 'follow' });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    if (!result.leaderboard || result.leaderboard.length === 0) {
+                        listEl.innerHTML = '<li class="leaderboard-item" style="justify-content:center; color:#888;">尚無紀錄，快來挑戰！</li>';
+                        return;
+                    }
+                    listEl.innerHTML = result.leaderboard.map((item, index) => `
+                        <li class="leaderboard-item">
+                            <span>#${index + 1} ${item.name}</span>
+                            <span>${item.score} 分</span>
+                        </li>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<li class="leaderboard-item" style="justify-content:center; color:#ff2a85;">讀取資料發生錯誤</li>';
+                }
+            } catch (err) {
+                console.error(err);
+                listEl.innerHTML = '<li class="leaderboard-item" style="justify-content:center; color:#ff2a85;">無法連接至雲端伺服器</li>';
+            }
+        }
+
+        // 上傳分數 (多重連線備援)
+        async function submitScore() {
+            const nameInput = document.getElementById('playerName');
+            const name = nameInput.value.trim() || '無名氏';
+            const statusEl = document.getElementById('uploadStatus');
+            const btnSubmit = document.getElementById('btnSubmitScore');
+
+            statusEl.innerText = '上傳中...';
+            btnSubmit.disabled = true;
+
+            // 1. 嘗試使用標準 POST 上傳
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ name: name, score: score })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    statusEl.innerText = '✅ 上傳成功！';
+                    setTimeout(fetchLeaderboard, 1000);
+                    return;
+                }
+            } catch (err) {
+                console.warn('POST JSON 失敗，嘗試 fallback 機制...', err);
+            }
+
+            // 2. 備援機制：如果 CORS 被攔截，改用 no-cors 模式確保資料送達試算表
+            try {
+                const formData = new URLSearchParams();
+                formData.append('name', name);
+                formData.append('score', score);
+
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+
+                statusEl.innerText = '✅ 上傳完成！';
+                setTimeout(fetchLeaderboard, 1500);
+            } catch (err) {
+                console.error('上傳失敗:', err);
+                statusEl.innerText = '❌ 上傳失敗，請檢查網路連線';
+                btnSubmit.disabled = false;
+            }
+        }
+
         draw();
+        fetchLeaderboard();
     </script>
 </body>
 </html>
