@@ -28,115 +28,117 @@
     <style>
         body {
             font-family: 'Noto Sans TC', 'Inter', sans-serif;
-            background-color: #e6ecf5;
-            color: #4a5568;
+            background-color: #f4ede4;
+            color: #524636;
         }
 
-        /* Neumorphism Flat Extruded Surface */
+        /* Warm Neumorphism Flat Extruded Surface */
         .neu-card {
-            background: #e6ecf5;
-            box-shadow: 9px 9px 18px #c5d0e0, -9px -9px 18px #ffffff;
+            background: #f4ede4;
+            box-shadow: 9px 9px 18px #dcd3c7, -9px -9px 18px #ffffff;
             border-radius: 20px;
         }
 
         /* Small Neumorphic Card / Tag */
         .neu-card-sm {
-            background: #e6ecf5;
-            box-shadow: 5px 5px 10px #c5d0e0, -5px -5px 10px #ffffff;
+            background: #f4ede4;
+            box-shadow: 5px 5px 10px #dcd3c7, -5px -5px 10px #ffffff;
             border-radius: 14px;
         }
 
         /* Neumorphic Inset / Recessed Effect */
         .neu-inset {
-            background: #e6ecf5;
-            box-shadow: inset 4px 4px 8px #c5d0e0, inset -4px -4px 8px #ffffff;
+            background: #f4ede4;
+            box-shadow: inset 4px 4px 8px #dcd3c7, inset -4px -4px 8px #ffffff;
             border-radius: 12px;
         }
 
         /* Interactive Neumorphic Button */
         .neu-btn {
-            background: #e6ecf5;
-            box-shadow: 6px 6px 12px #c5d0e0, -6px -6px 12px #ffffff;
+            background: #f4ede4;
+            box-shadow: 6px 6px 12px #dcd3c7, -6px -6px 12px #ffffff;
             border-radius: 14px;
             transition: all 0.2s ease;
         }
 
         .neu-btn:hover {
-            box-shadow: 3px 3px 6px #c5d0e0, -3px -3px 6px #ffffff;
+            box-shadow: 3px 3px 6px #dcd3c7, -3px -3px 6px #ffffff;
             transform: translateY(1px);
         }
 
         .neu-btn:active {
-            box-shadow: inset 4px 4px 8px #c5d0e0, inset -4px -4px 8px #ffffff;
+            box-shadow: inset 4px 4px 8px #dcd3c7, inset -4px -4px 8px #ffffff;
             transform: translateY(2px);
         }
 
-        /* Accent Primary Button */
+        /* Accent Primary Button (Warm Amber Gradient) */
         .neu-btn-primary {
-            background: linear-gradient(145deg, #4f80e1, #426cc0);
-            box-shadow: 6px 6px 14px #b8c6dc, -6px -6px 14px #ffffff;
+            background: linear-gradient(145deg, #d97706, #b45309);
+            box-shadow: 6px 6px 14px #dcd3c7, -6px -6px 14px #ffffff;
             color: #ffffff;
             border-radius: 14px;
             transition: all 0.2s ease;
         }
 
         .neu-btn-primary:hover {
-            background: linear-gradient(145deg, #426cc0, #4f80e1);
-            box-shadow: 3px 3px 8px #b8c6dc, -3px -3px 8px #ffffff;
+            background: linear-gradient(145deg, #b45309, #d97706);
+            box-shadow: 3px 3px 8px #dcd3c7, -3px -3px 8px #ffffff;
         }
 
         .neu-btn-primary:active {
-            box-shadow: inset 3px 3px 6px #2e4b86, inset -3px -3px 6px #5c93ff;
+            box-shadow: inset 3px 3px 6px #78350f, inset -3px -3px 6px #f59e0b;
         }
 
-        /* Accent Game Button (Purple/Pink Gradient for game call) */
+        /* Unified Accent Game Button */
         .neu-btn-game {
-            background: linear-gradient(145deg, #8b5cf6, #ec4899);
-            box-shadow: 6px 6px 14px #b8c6dc, -6px -6px 14px #ffffff;
+            background: linear-gradient(145deg, #f59e0b, #d97706);
+            box-shadow: 6px 6px 14px #dcd3c7, -6px -6px 14px #ffffff;
             color: #ffffff;
             border-radius: 14px;
             transition: all 0.2s ease;
         }
 
         .neu-btn-game:hover {
-            background: linear-gradient(145deg, #ec4899, #8b5cf6);
-            box-shadow: 3px 3px 8px #b8c6dc, -3px -3px 8px #ffffff;
+            background: linear-gradient(145deg, #d97706, #f59e0b);
+            box-shadow: 3px 3px 8px #dcd3c7, -3px -3px 8px #ffffff;
             transform: translateY(-1px);
         }
 
-        /* Soft Geometric Initials Badge */
-        .neu-initials-badge {
-            background: #e6ecf5;
-            box-shadow: 10px 10px 20px #c5d0e0, -10px -10px 20px #ffffff;
+        /* Photo Frame Badge */
+        .neu-photo-badge {
+            background: #f4ede4;
+            box-shadow: 10px 10px 20px #dcd3c7, -10px -10px 20px #ffffff;
             border-radius: 28px;
         }
 
         /* Modal Backdrop Blur */
         .modal-backdrop {
-            background-color: rgba(230, 236, 245, 0.85);
+            background-color: rgba(244, 237, 228, 0.85);
             backdrop-filter: blur(8px);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased">
 
-    <header class="sticky top-0 z-40 bg-[#e6ecf5]/90 backdrop-blur-md px-4 py-4 md:px-8">
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 bg-[#f4ede4]/90 backdrop-blur-md px-4 py-4 md:px-8">
         <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <a href="#home" class="font-bold text-lg text-slate-700 tracking-wider flex items-center gap-2 px-3 py-2 neu-card-sm">
-                <i class="fa-solid fa-graduation-cap text-blue-500"></i>
+            <a href="#home" class="font-bold text-lg text-amber-900 tracking-wider flex items-center gap-2 px-3 py-2 neu-card-sm">
+                <i class="fa-solid fa-graduation-cap text-amber-600"></i>
                 <span>賴姵璇</span>
             </a>
             
             <nav class="hidden md:flex items-center space-x-4 text-sm font-medium">
-                <a href="#home" class="px-4 py-2 neu-btn text-slate-700 hover:text-blue-600">Home</a>
-                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
-                    News <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
+                <a href="#home" class="px-4 py-2 neu-btn text-amber-900 hover:text-amber-600">Home</a>
+                <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
+                    News <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
-                <span class="px-4 py-2 neu-inset text-slate-400 cursor-not-allowed text-xs flex items-center gap-1.5">
-                    Tools <span class="bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
+                <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
+                    Tools <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
-                <a href="game.html" class="px-4 py-2 neu-btn text-purple-600 hover:text-pink-600 font-semibold flex items-center gap-1.5">
-                    <i class="fa-solid fa-gamepad text-purple-500"></i> Games
+                <!-- Unified Game Link -->
+                <a href="game.html" class="px-4 py-2 neu-btn font-semibold text-amber-700 hover:text-amber-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gamepad text-amber-600"></i> 玩我的小遊戲
                 </a>
             </nav>
 
@@ -146,12 +148,12 @@
         </div>
 
         <!-- Mobile Navigation Bar -->
-        <div class="flex md:hidden justify-center gap-2 mt-3 pt-2 border-t border-slate-300/40 text-xs">
-            <a href="#home" class="px-3 py-1.5 neu-btn text-slate-700">Home</a>
-            <span class="px-2.5 py-1.5 neu-inset text-slate-400">News <span class="text-[9px] opacity-75">Soon</span></span>
-            <span class="px-2.5 py-1.5 neu-inset text-slate-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
-            <a href="game.html" class="px-3 py-1.5 neu-btn text-purple-600 font-semibold flex items-center gap-1">
-                <i class="fa-solid fa-gamepad"></i> Games
+        <div class="flex md:hidden justify-center gap-2 mt-3 pt-2 border-t border-stone-300/40 text-xs">
+            <a href="#home" class="px-3 py-1.5 neu-btn text-amber-900">Home</a>
+            <span class="px-2.5 py-1.5 neu-inset text-stone-400">News <span class="text-[9px] opacity-75">Soon</span></span>
+            <span class="px-2.5 py-1.5 neu-inset text-stone-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
+            <a href="game.html" class="px-3 py-1.5 neu-btn text-amber-700 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-gamepad text-amber-600"></i> 玩我的小遊戲
             </a>
         </div>
     </header>
@@ -160,123 +162,124 @@
 
         <!-- Hero Section -->
         <section class="neu-card p-6 md:p-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-            <!-- Non-Photo Initial Monogram Badge -->
+            <!-- Personal Photo Image Frame -->
             <div class="flex-shrink-0">
-                <div class="neu-initials-badge w-36 h-36 md:w-44 md:h-44 flex flex-col items-center justify-center border border-white/40">
-                    <span class="text-4xl md:text-5xl font-extrabold text-blue-500 tracking-wider">賴</span>
-                    <span class="text-xs font-semibold text-slate-400 mt-1 tracking-widest uppercase">P.H. LAI</span>
+                <div class="neu-photo-badge w-36 h-36 md:w-44 md:h-44 p-2.5 border border-white/60 overflow-hidden rounded-[28px]">
+                    <img src="IMG_7803.jpg" alt="賴姵璇" class="w-full h-full object-cover rounded-[22px]">
                 </div>
             </div>
 
             <!-- Identity Info -->
             <div class="flex-grow text-center md:text-left space-y-4">
-                <div class="inline-block px-3 py-1 neu-inset text-xs font-semibold text-blue-600 tracking-wider">
+                <div class="inline-block px-3 py-1 neu-inset text-xs font-semibold text-amber-700 tracking-wider">
                     PERSONAL PROFILE
                 </div>
-                <h1 class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
+                <h1 class="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">
                     賴姵璇
                 </h1>
-                <p class="text-base md:text-lg text-slate-600 font-medium leading-relaxed">
-                    大同大學事業經營學系 學生，專注於行政文書處理與顧客服務接待。
+                <p class="text-base md:text-lg text-stone-600 font-medium leading-relaxed">
+                    大同大學事業經營學系學生，專注於行政文書處理與顧客服務接待。
                 </p>
                 <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
+                    <!-- Unified Game Button -->
                     <a href="game.html" class="px-6 py-2.5 neu-btn-game font-bold text-sm flex items-center gap-2">
                         <i class="fa-solid fa-gamepad text-base"></i> 玩我的小遊戲
                     </a>
                     <button onclick="toggleContactModal()" class="px-6 py-2.5 neu-btn-primary font-medium text-sm flex items-center gap-2">
                         <i class="fa-regular fa-envelope"></i> 立即聯絡
                     </button>
-                    <a href="#about" class="px-5 py-2.5 neu-btn font-medium text-sm text-slate-700">
+                    <a href="#about" class="px-5 py-2.5 neu-btn font-medium text-sm text-stone-700">
                         了解更多
                     </a>
                 </div>
             </div>
         </section>
 
+        <!-- About Section -->
         <section id="about" class="space-y-4">
             <div class="flex items-center gap-3">
-                <div class="w-3 h-8 bg-blue-500 rounded-full neu-card-sm"></div>
-                <h2 class="text-xl font-bold text-slate-800">關於我</h2>
+                <div class="w-3 h-8 bg-amber-600 rounded-full neu-card-sm"></div>
+                <h2 class="text-xl font-bold text-stone-800">關於我</h2>
             </div>
             
             <div class="neu-card p-6 md:p-8">
-                <!-- Exact Traditional Chinese Biography Text (137 Characters) -->
-                <p class="text-slate-700 leading-relaxed text-base md:text-lg tracking-wide">
+                <p class="text-stone-700 leading-relaxed text-base md:text-lg tracking-wide">
                     賴姵璇，目前就讀大同大學事業經營學系，自2023年入學，預計於2027年7月畢業。曾於建設公司擔任接待禮賓人員，也曾在補習班擔任櫃檯。暑期曾至地政業實習，主要接觸行政與文書處理。平時使用Word、Canva及PowerPoint處理課業與工作內容。個性樂觀、懂得變通，也重視細節。課餘時間喜歡跑步，作為日常生活中的興趣。
                 </p>
             </div>
         </section>
 
+        <!-- Skills & Tools -->
         <section class="space-y-6">
             <div class="flex items-center gap-3">
-                <div class="w-3 h-8 bg-blue-500 rounded-full neu-card-sm"></div>
-                <h2 class="text-xl font-bold text-slate-800">專長與工具</h2>
+                <div class="w-3 h-8 bg-amber-600 rounded-full neu-card-sm"></div>
+                <h2 class="text-xl font-bold text-stone-800">專長與工具</h2>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <!-- Tool 1 -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-blue-600 rounded-xl">
+                    <div class="p-3 neu-inset text-amber-600 rounded-xl">
                         <i class="fa-solid fa-file-word text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">Microsoft Word</h3>
-                        <p class="text-xs text-slate-500 mt-1">課業報告與行政文書編輯處理</p>
+                        <h3 class="font-bold text-stone-800 text-base">Microsoft Word</h3>
+                        <p class="text-xs text-stone-500 mt-1">課業報告與行政文書編輯處理</p>
                     </div>
                 </div>
 
                 <!-- Tool 2 -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-indigo-500 rounded-xl">
+                    <div class="p-3 neu-inset text-amber-700 rounded-xl">
                         <i class="fa-solid fa-palette text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">Canva</h3>
-                        <p class="text-xs text-slate-500 mt-1">視覺文宣設計與簡報編排</p>
+                        <h3 class="font-bold text-stone-800 text-base">Canva</h3>
+                        <p class="text-xs text-stone-500 mt-1">視覺文宣設計與簡報編排</p>
                     </div>
                 </div>
 
                 <!-- Tool 3 -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-orange-500 rounded-xl">
+                    <div class="p-3 neu-inset text-orange-600 rounded-xl">
                         <i class="fa-solid fa-file-powerpoint text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">PowerPoint</h3>
-                        <p class="text-xs text-slate-500 mt-1">簡報製作與課程專題展示</p>
+                        <h3 class="font-bold text-stone-800 text-base">PowerPoint</h3>
+                        <p class="text-xs text-stone-500 mt-1">簡報製作與課程專題展示</p>
                     </div>
                 </div>
 
                 <!-- Competency 1 -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-emerald-500 rounded-xl">
+                    <div class="p-3 neu-inset text-amber-600 rounded-xl">
                         <i class="fa-solid fa-folder-open text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">行政與文書處理</h3>
-                        <p class="text-xs text-slate-500 mt-1">地政實習與補習班櫃檯實務</p>
+                        <h3 class="font-bold text-stone-800 text-base">行政與文書處理</h3>
+                        <p class="text-xs text-stone-500 mt-1">地政實習與補習班櫃檯實務</p>
                     </div>
                 </div>
 
                 <!-- Competency 2 -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-sky-500 rounded-xl">
+                    <div class="p-3 neu-inset text-amber-700 rounded-xl">
                         <i class="fa-solid fa-bell-concierge text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">接待與禮賓服務</h3>
-                        <p class="text-xs text-slate-500 mt-1">建設公司接待與客戶服務</p>
+                        <h3 class="font-bold text-stone-800 text-base">接待與禮賓服務</h3>
+                        <p class="text-xs text-stone-500 mt-1">建設公司接待與客戶服務</p>
                     </div>
                 </div>
 
                 <!-- Personal Interest -->
                 <div class="neu-card p-5 flex items-start gap-4 hover:translate-y-[-2px] transition-transform">
-                    <div class="p-3 neu-inset text-rose-500 rounded-xl">
+                    <div class="p-3 neu-inset text-amber-600 rounded-xl">
                         <i class="fa-solid fa-person-running text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base">課餘興趣</h3>
-                        <p class="text-xs text-slate-500 mt-1">規律跑步，保持樂觀與專注細節</p>
+                        <h3 class="font-bold text-stone-800 text-base">課餘興趣</h3>
+                        <p class="text-xs text-stone-500 mt-1">規律跑步，保持樂觀與專注細節</p>
                     </div>
                 </div>
             </div>
@@ -284,8 +287,8 @@
 
         <!-- Primary CTA Card -->
         <section class="neu-card p-8 text-center space-y-4">
-            <h3 class="text-2xl font-bold text-slate-800">準備好進行交流或合作了嗎？</h3>
-            <p class="text-slate-600 text-sm md:text-base max-w-xl mx-auto">
+            <h3 class="text-2xl font-bold text-stone-800">準備好進行交流或合作了嗎？</h3>
+            <p class="text-stone-600 text-sm md:text-base max-w-xl mx-auto">
                 如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，或是想放鬆放鬆體驗遊戲，都歡迎與我聯繫或試玩！
             </p>
             <div class="pt-2 flex flex-wrap justify-center gap-4">
@@ -300,17 +303,17 @@
 
     </main>
 
-    <footer class="mt-12 border-t border-slate-300/40 py-8 px-4 text-center">
+    <footer class="mt-12 border-t border-stone-300/40 py-8 px-4 text-center">
         <div class="max-w-5xl mx-auto space-y-4">
-            <div class="flex justify-center items-center gap-4 text-sm text-slate-600">
+            <div class="flex justify-center items-center gap-4 text-sm text-stone-600">
                 <span class="neu-card-sm px-3 py-1.5 flex items-center gap-2">
-                    <i class="fa-solid fa-graduation-cap text-blue-500"></i> 大同大學事業經營學系
+                    <i class="fa-solid fa-graduation-cap text-amber-600"></i> 大同大學事業經營學系
                 </span>
                 <span class="neu-card-sm px-3 py-1.5 flex items-center gap-2">
-                    <i class="fa-solid fa-person-running text-emerald-500"></i> 樂觀・變通・注重細節
+                    <i class="fa-solid fa-person-running text-amber-600"></i> 樂觀・變通・注重細節
                 </span>
             </div>
-            <p class="text-xs text-slate-500 pt-2">
+            <p class="text-xs text-stone-500 pt-2">
                 &copy; 賴姵璇. All rights reserved.
             </p>
         </div>
@@ -320,33 +323,33 @@
     <div id="contactModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
         <div class="neu-card w-full max-w-md p-6 md:p-8 relative space-y-6">
             <!-- Close Button -->
-            <button onclick="toggleContactModal()" class="absolute top-4 right-4 w-9 h-9 neu-btn flex items-center justify-center text-slate-500 hover:text-slate-800">
+            <button onclick="toggleContactModal()" class="absolute top-4 right-4 w-9 h-9 neu-btn flex items-center justify-center text-stone-500 hover:text-stone-800">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
             <div class="text-center space-y-2">
-                <div class="w-12 h-12 neu-inset mx-auto flex items-center justify-center text-blue-500 rounded-full">
+                <div class="w-12 h-12 neu-inset mx-auto flex items-center justify-center text-amber-600 rounded-full">
                     <i class="fa-solid fa-envelope-open-text text-xl"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-800">聯絡賴姵璇</h3>
-                <p class="text-xs text-slate-500">請填寫訊息，我將會在收到後盡快回覆您。</p>
+                <h3 class="text-xl font-bold text-stone-800">聯絡賴姵璇</h3>
+                <p class="text-xs text-stone-500">請填寫訊息，我將會在收到後盡快回覆您。</p>
             </div>
 
             <!-- Contact Form -->
             <form onsubmit="handleFormSubmit(event)" class="space-y-4">
                 <div class="space-y-1 text-left">
-                    <label class="text-xs font-semibold text-slate-600 ml-1">您的姓名</label>
-                    <input type="text" required placeholder="請輸入姓名" class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none">
+                    <label class="text-xs font-semibold text-stone-600 ml-1">您的姓名</label>
+                    <input type="text" required placeholder="請輸入姓名" class="w-full px-4 py-2.5 neu-inset text-sm text-stone-700 focus:outline-none">
                 </div>
 
                 <div class="space-y-1 text-left">
-                    <label class="text-xs font-semibold text-slate-600 ml-1">電子郵件</label>
-                    <input type="email" required placeholder="example@email.com" class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none">
+                    <label class="text-xs font-semibold text-stone-600 ml-1">電子郵件</label>
+                    <input type="email" required placeholder="example@email.com" class="w-full px-4 py-2.5 neu-inset text-sm text-stone-700 focus:outline-none">
                 </div>
 
                 <div class="space-y-1 text-left">
-                    <label class="text-xs font-semibold text-slate-600 ml-1">訊息內容</label>
-                    <textarea rows="3" required placeholder="請輸入您想交流的事項..." class="w-full px-4 py-2.5 neu-inset text-sm text-slate-700 focus:outline-none resize-none"></textarea>
+                    <label class="text-xs font-semibold text-stone-600 ml-1">訊息內容</label>
+                    <textarea rows="3" required placeholder="請輸入您想交流的事項..." class="w-full px-4 py-2.5 neu-inset text-sm text-stone-700 focus:outline-none resize-none"></textarea>
                 </div>
 
                 <button type="submit" class="w-full py-3 neu-btn-primary font-bold text-sm mt-2">
@@ -354,7 +357,7 @@
                 </button>
             </form>
 
-            <div id="formFeedback" class="hidden p-3 neu-inset text-center text-xs text-emerald-600 font-medium">
+            <div id="formFeedback" class="hidden p-3 neu-inset text-center text-xs text-amber-700 font-medium">
                 <i class="fa-solid fa-circle-check mr-1"></i> 訊息已成功發送！謝謝您的聯絡。
             </div>
         </div>
