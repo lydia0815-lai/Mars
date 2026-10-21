@@ -20,7 +20,7 @@
     <!-- Google Fonts - Inter & Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -89,8 +89,8 @@
             box-shadow: inset 3px 3px 6px #78350f, inset -3px -3px 6px #f59e0b;
         }
 
-        /* Unified Accent Game Button */
-        .neu-btn-game {
+        /* Unified Accent Game Button (Snake Game - Warm Amber) */
+        .neu-btn-game-snake {
             background: linear-gradient(145deg, #f59e0b, #d97706);
             box-shadow: 6px 6px 14px #dcd3c7, -6px -6px 14px #ffffff;
             color: #ffffff;
@@ -98,8 +98,23 @@
             transition: all 0.2s ease;
         }
 
-        .neu-btn-game:hover {
+        .neu-btn-game-snake:hover {
             background: linear-gradient(145deg, #d97706, #f59e0b);
+            box-shadow: 3px 3px 8px #dcd3c7, -3px -3px 8px #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Sky Blue Accent Game Button (RPS Game - Sky Soft Blue) */
+        .neu-btn-game-sky {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            box-shadow: 6px 6px 14px #dcd3c7, -6px -6px 14px #ffffff;
+            color: #ffffff;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .neu-btn-game-sky:hover {
+            background: linear-gradient(145deg, #2563eb, #3b82f6);
             box-shadow: 3px 3px 8px #dcd3c7, -3px -3px 8px #ffffff;
             transform: translateY(-1px);
         }
@@ -130,16 +145,15 @@
             
             <nav class="hidden md:flex items-center space-x-4 text-sm font-medium">
                 <a href="#home" class="px-4 py-2 neu-btn text-amber-900 hover:text-amber-600">Home</a>
+                <a href="#games" class="px-4 py-2 neu-btn font-semibold text-amber-700 hover:text-amber-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gamepad text-amber-600"></i> 小遊戲專區
+                </a>
                 <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
                     News <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
                 <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
                     Tools <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
-                <!-- Unified Game Link -->
-                <a href="game.html" class="px-4 py-2 neu-btn font-semibold text-amber-700 hover:text-amber-600 flex items-center gap-1.5">
-                    <i class="fa-solid fa-gamepad text-amber-600"></i> 玩我的小遊戲
-                </a>
             </nav>
 
             <button onclick="toggleContactModal()" class="px-4 py-2 neu-btn-primary font-medium text-sm flex items-center gap-2">
@@ -150,11 +164,11 @@
         <!-- Mobile Navigation Bar -->
         <div class="flex md:hidden justify-center gap-2 mt-3 pt-2 border-t border-stone-300/40 text-xs">
             <a href="#home" class="px-3 py-1.5 neu-btn text-amber-900">Home</a>
+            <a href="#games" class="px-3 py-1.5 neu-btn text-amber-700 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-gamepad text-amber-600"></i> 小遊戲專區
+            </a>
             <span class="px-2.5 py-1.5 neu-inset text-stone-400">News <span class="text-[9px] opacity-75">Soon</span></span>
             <span class="px-2.5 py-1.5 neu-inset text-stone-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
-            <a href="game.html" class="px-3 py-1.5 neu-btn text-amber-700 font-semibold flex items-center gap-1">
-                <i class="fa-solid fa-gamepad text-amber-600"></i> 玩我的小遊戲
-            </a>
         </div>
     </header>
 
@@ -165,7 +179,7 @@
             <!-- Personal Photo Image Frame -->
             <div class="flex-shrink-0">
                 <div class="neu-photo-badge w-36 h-36 md:w-44 md:h-44 p-2.5 border border-white/60 overflow-hidden rounded-[28px]">
-                    <img src="IMG_7803.JPG" alt="賴姵璇" class="w-full h-full object-cover rounded-[22px]">
+                    <img src="IMG_7803.jpg" alt="賴姵璇" class="w-full h-full object-cover rounded-[22px]">
                 </div>
             </div>
 
@@ -181,11 +195,10 @@
                     大同大學事業經營學系學生，專注於行政文書處理與顧客服務接待。
                 </p>
                 <div class="pt-2 flex flex-wrap justify-center md:justify-start gap-3">
-                    <!-- Unified Game Button -->
-                    <a href="game.html" class="px-6 py-2.5 neu-btn-game font-bold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-gamepad text-base"></i> 玩我的小遊戲
+                    <a href="#games" class="px-5 py-2.5 neu-btn-game-snake font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-base"></i> 體驗小遊戲
                     </a>
-                    <button onclick="toggleContactModal()" class="px-6 py-2.5 neu-btn-primary font-medium text-sm flex items-center gap-2">
+                    <button onclick="toggleContactModal()" class="px-5 py-2.5 neu-btn-primary font-medium text-sm flex items-center gap-2">
                         <i class="fa-regular fa-envelope"></i> 立即聯絡
                     </button>
                     <a href="#about" class="px-5 py-2.5 neu-btn font-medium text-sm text-stone-700">
@@ -206,6 +219,76 @@
                 <p class="text-stone-700 leading-relaxed text-base md:text-lg tracking-wide">
                     賴姵璇，目前就讀大同大學事業經營學系，自2023年入學，預計於2027年7月畢業。曾於建設公司擔任接待禮賓人員，也曾在補習班擔任櫃檯。暑期曾至地政業實習，主要接觸行政與文書處理。平時使用Word、Canva及PowerPoint處理課業與工作內容。個性樂觀、懂得變通，也重視細節。課餘時間喜歡跑步，作為日常生活中的興趣。
                 </p>
+            </div>
+        </section>
+
+        <!-- Interactive Games Showcase Section -->
+        <section id="games" class="space-y-6 pt-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-8 bg-amber-600 rounded-full neu-card-sm"></div>
+                    <div>
+                        <h2 class="text-xl font-bold text-stone-800">互動小遊戲專區</h2>
+                        <p class="text-xs text-stone-500 mt-0.5">課餘時光的休閒作品，歡迎試玩體驗！</p>
+                    </div>
+                </div>
+                <span class="hidden sm:inline-block px-3 py-1 neu-inset text-xs font-semibold text-amber-700">
+                    2 款精選遊戲
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Game 1: Snake Game -->
+                <div class="neu-card p-6 flex flex-col justify-between space-y-5 border border-amber-200/50 hover:translate-y-[-2px] transition-transform">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 neu-inset text-xs font-bold text-amber-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-user text-amber-600"></i> 單人 / 休閒
+                            </span>
+                            <span class="text-3xl">🐍</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-800 flex items-center gap-2">
+                                《蛇來運轉》經典貪食蛇
+                            </h3>
+                            <p class="text-xs text-stone-500 mt-1 leading-relaxed">
+                                重溫懷舊經典的貪食蛇遊戲！控制蛇吞食成長，挑戰最高得分，體驗流暢手感與歡樂節奏。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <a href="game.html" class="w-full py-3 neu-btn-game-snake font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play text-xs"></i> 開始玩貪食蛇
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Game 2: Rock Paper Scissors Game -->
+                <div class="neu-card p-6 flex flex-col justify-between space-y-5 border border-sky-200/50 hover:translate-y-[-2px] transition-transform">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-3 py-1 neu-inset text-xs font-bold text-blue-600 flex items-center gap-1.5">
+                                <i class="fa-solid fa-users text-blue-500"></i> 2~3人 / 即時連線
+                            </span>
+                            <span class="text-3xl">🌤️</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-stone-800 flex items-center gap-2">
+                                《雲端對決》天空猜拳
+                            </h3>
+                            <p class="text-xs text-stone-500 mt-1 leading-relaxed">
+                                輕鬆的雲端多人在線猜拳對戰！輸入 4 位數房號即可與朋友連線，即時開局、自動結算分數與記錄歷史戰績。
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <a href="game2.html" class="w-full py-3 neu-btn-game-sky font-bold text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cloud text-xs"></i> 進入天空猜拳房
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -289,13 +372,13 @@
         <section class="neu-card p-8 text-center space-y-4">
             <h3 class="text-2xl font-bold text-stone-800">準備好進行交流或合作了嗎？</h3>
             <p class="text-stone-600 text-sm md:text-base max-w-xl mx-auto">
-                如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，或是想放鬆放鬆體驗遊戲，都歡迎與我聯繫或試玩！
+                如果您對我的實習經歷、禮賓接待或行政處理能力有興趣，或是想放鬆放鬆體驗小遊戲，都歡迎與我聯繫或試玩！
             </p>
-            <div class="pt-2 flex flex-wrap justify-center gap-4">
-                <a href="game.html" class="px-8 py-3 neu-btn-game font-bold text-base inline-flex items-center gap-2">
-                    <i class="fa-solid fa-gamepad"></i> 玩我的小遊戲
+            <div class="pt-2 flex flex-wrap justify-center gap-3">
+                <a href="#games" class="px-6 py-3 neu-btn-game-snake font-bold text-sm inline-flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad"></i> 瀏覽小遊戲專區
                 </a>
-                <button onclick="toggleContactModal()" class="px-8 py-3 neu-btn-primary font-bold text-base inline-flex items-center gap-2">
+                <button onclick="toggleContactModal()" class="px-6 py-3 neu-btn-primary font-bold text-sm inline-flex items-center gap-2">
                     <i class="fa-solid fa-paper-plane"></i> 聯絡我
                 </button>
             </div>
