@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>線上雙人猜拳對戰</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (v13.0.0 Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
+
+        // 你的 Firebase 設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_XwMWXpUg3OJZBLx0e1A2LKNFl3mpnn8",
+            authDomain: "project-9055340413398078399.firebaseapp.com",
+            databaseURL: "https://project-9055340413398078399-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "project-9055340413398078399",
+            storageBucket: "project-9055340413398078399.firebasestorage.app",
+            messagingSenderId: "984429802835",
+            appId: "1:984429802835:web:038d4191feb28d93259da6",
+            measurementId: "G-Z5D344VKHP"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+
+        // ==========================================
+        // 全域狀態變數
+        // ==========================================
+        let currentUser = {
+            id: 'user_' + Math.random().toString(36).substr(2, 9),
+            name: '',
+            role: null,
+            choice: null
+        };
+
+        let currentRoomCode = null;
+        let roomRef = null;
+        let roomUnsubscribe = null;
+
+        const CHOICES = {
+            scissors: { emoji: '✌️', name: '剪刀' },
+            rock: { emoji: '✊', name: '石頭' },
+            paper: { emoji: '✋', name: '布' }
+        };
+
+        // ==========================================
+        // DOM 元素參考
+        // ==========================================
+        const views = {
+            lobby: document.getElementById('view-lobby'),
+            room: document.getElementById('view-room')
+        };
+
+        const inputs = {
+            nickname: document.getElementById('input-nickname'),
+            roomCode: document.getElementById('input-room-code')
+        };
+
+        const buttons = {
+            create: document.getElementById('btn-create-room'),
+            join: document.getElementById('btn-join-room'),
+            leave: document.getElementById('btn-leave-room'),
+            choices: document.querySelectorAll('.choice-btn')
+        };
+
+        const displays = {
+            roomCode: document.getElementById('display-room-code'),
+            playerCount: document.getElementById('display-player-count'),
+            result: document.getElementById('display-result'),
+            actionHint: document.getElementById('action-hint'),
+            p1Name: document.getElementById('p1-name'),
+            p1Status: document.getElementById('p1-status'),
+            p1Choice: document.getElementById('p1-choice'),
+            cardP1: document.getElementById('card-p1'),
+            p2Name: document.getElementById('p2-name'),
+            p2Status: document.getElementById('p2-status'),
+            p2Choice: document.getElementById('p2-choice'),
+            cardP2: document.getElementById('card-p2'),
+            spectatorBox: document.getElementById('box-spectator'),
+            spectatorName: document.getElementById('spectator-name'),
+            areaControls: document.getElementById('area-controls')
+        };
+
+        // 自動還原上次暱稱
+        const savedName = localStorage.getItem('rps_nickname');
+        if (savedName) inputs.nickname.value = savedName;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function switchView(viewName) {
+            Object.keys(views).forEach(key => {
+                views[key].classList.toggle('active', key === viewName);
+            });
+        }
+
+        function generateRoomCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        function validateNickname() {
+            const name = inputs.nickname.value.trim();
+            if (!name) {
+                showToast('請先輸入玩家暱稱！');
+                inputs.nickname.focus();
+                return null;
+            }
+            localStorage.setItem('rps_nickname', name);
+            currentUser.name = name;
+            return name;
+        }
+
+        // 創建房間
+        buttons.create.addEventListener('click', async () => {
+            if (!validateNickname()) return;
+
+            const code = generateRoomCode();
+            const newRoomRef = ref(db, `rooms/${code}`);
+
+            try {
+                const snapshot = await get(newRoomRef);
+                if (snapshot.exists()) {
+                    buttons.create.click();
+                    return;
+                }
+
+                const initialData = {
+                    createdAt: serverTimestamp(),
+                    players: {
+                        p1: {
+                            id: currentUser.id,
+                            name: currentUser.name,
+                            choice: ""
+                        }
+                    }
+                };
+
+                await set(newRoomRef, initialData);
+                currentUser.role = 'p1';
+                enterRoom(code);
+            } catch (err) {
+                showToast('建立失敗，請確認 Firebase 資料庫連線');
+                console.error(err);
+            }
+        });
+
+        // 加入房間
+        buttons.join.addEventListener('click', async () => {
+            if (!validateNickname()) return;
+
+            const code = inputs.roomCode.value.trim();
+            if (code.length !== 4 || !/^\d{4}$/.test(code)) {
+                showToast('請輸入 4 位數數字房號！');
+                return;
+            }
+
+            const targetRoomRef = ref(db, `rooms/${code}`);
+
+            try {
+                const snapshot = await get(targetRoomRef);
+                if (!snapshot.exists()) {
+                    showToast('找不到該房間，請檢查房號');
+                    return;
+                }
+
+                const data = snapshot.val();
+                const players = data.players || {};
+                const playerCount = Object.keys(players).length;
+
+                if (playerCount >= 3) {
+                    showToast('房間人數已滿 (上限 3 人)');
+                    return;
+                }
+
+                let assignedRole = '';
+                if (!players.p1) {
+                    assignedRole = 'p1';
+                } else if (!players.p2) {
+                    assignedRole = 'p2';
+                } else {
+                    assignedRole = 'spectator';
+                }
+
+                currentUser.role = assignedRole;
+
+                await set(ref(db, `rooms/${code}/players/${assignedRole}`), {
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    choice: ""
+                });
+
+                enterRoom(code);
+            } catch (err) {
+                showToast('加入失敗，請稍後再試');
+                console.error(err);
+            }
+        });
+
+        function enterRoom(code) {
+            currentRoomCode = code;
+            displays.roomCode.textContent = code;
+            roomRef = ref(db, `rooms/${code}`);
+
+            // 開始監聽房間
+            roomUnsubscribe = onValue(roomRef, (snapshot) => {
+                if (!snapshot.exists()) {
+                    showToast('房間已關閉');
+                    exitRoom(false);
+                    return;
+                }
+                updateRoomUI(snapshot.val());
+            });
+
+            switchView('room');
+            showToast(`已進入房間 ${code}`);
+        }
+
+        function updateRoomUI(data) {
+            const players = data.players || {};
+            const p1 = players.p1;
+            const p2 = players.p2;
+            const spectator = players.spectator;
+
+            const count = Object.keys(players).length;
+            displays.playerCount.textContent = `${count} / 3 人`;
+
+            if (p1) {
+                displays.p1Name.textContent = p1.name + (currentUser.role === 'p1' ? ' (你)' : '');
+                displays.p1Status.textContent = p1.choice ? '已出拳' : '思考中...';
+                displays.cardP1.classList.toggle('is-me', currentUser.role === 'p1');
+            } else {
+                displays.p1Name.textContent = '等待玩家入座...';
+                displays.p1Status.textContent = '離線';
+                displays.p1Choice.textContent = '❓';
+                displays.cardP1.classList.remove('is-me');
+            }
+
+            if (p2) {
+                displays.p2Name.textContent = p2.name + (currentUser.role === 'p2' ? ' (你)' : '');
+                displays.p2Status.textContent = p2.choice ? '已出拳' : '思考中...';
+                displays.cardP2.classList.toggle('is-me', currentUser.role === 'p2');
+            } else {
+                displays.p2Name.textContent = '等待玩家入座...';
+                displays.p2Status.textContent = '離線';
+                displays.p2Choice.textContent = '❓';
+                displays.cardP2.classList.remove('is-me');
+            }
+
+            if (spectator) {
+                displays.spectatorBox.style.display = 'block';
+                displays.spectatorName.textContent = spectator.name + (currentUser.role === 'spectator' ? ' (你)' : '');
+            } else {
+                displays.spectatorBox.style.display = 'none';
+            }
+
+            if (currentUser.role === 'spectator') {
+                displays.areaControls.style.display = 'none';
+            } else {
+                displays.areaControls.style.display = 'flex';
+                const myChoice = players[currentUser.role]?.choice || null;
+                buttons.choices.forEach(btn => {
+                    const type = btn.getAttribute('data-choice');
+                    btn.classList.toggle('selected', type === myChoice);
+                });
+            }
+
+            if (!p1 || !p2) {
+                displays.p1Choice.textContent = '❓';
+                displays.p2Choice.textContent = '❓';
+                displays.result.textContent = '等待對手加入中...';
+                displays.actionHint.textContent = '等待對手入座';
+                toggleChoiceButtons(false);
+                return;
+            }
+
+            toggleChoiceButtons(true);
+
+            const p1Val = p1.choice;
+            const p2Val = p2.choice;
+
+            if (!p1Val || !p2Val) {
+                displays.p1Choice.textContent = p1Val ? '🔒' : '❓';
+                displays.p2Choice.textContent = p2Val ? '🔒' : '❓';
+
+                if (currentUser.role !== 'spectator') {
+                    const myVal = players[currentUser.role]?.choice;
+                    displays.actionHint.textContent = myVal ? '等待對手出拳...' : '請選擇你的出拳';
+                } else {
+                    displays.actionHint.textContent = '對戰進行中...';
+                }
+
+                displays.result.textContent = (p1Val || p2Val) ? '有一方已準備出拳...' : '雙方思考中...';
+            } else {
+                displays.p1Choice.textContent = CHOICES[p1Val].emoji;
+                displays.p2Choice.textContent = CHOICES[p2Val].emoji;
+
+                const outcome = getWinner(p1Val, p2Val);
+                if (outcome === 'draw') {
+                    displays.result.textContent = '🤝 平手！再試一次';
+                } else if (outcome === 'p1') {
+                    displays.result.textContent = `🎉 ${p1.name} 獲勝！`;
+                } else {
+                    displays.result.textContent = `🎉 ${p2.name} 獲勝！`;
+                }
+
+                displays.actionHint.textContent = '點選下方可隨時改拳重玩';
+            }
+        }
+
+        function toggleChoiceButtons(enabled) {
+            buttons.choices.forEach(btn => btn.disabled = !enabled);
+        }
+
+        function getWinner(c1, c2) {
+            if (c1 === c2) return 'draw';
+            if (
+                (c1 === 'scissors' && c2 === 'paper') ||
+                (c1 === 'rock' && c2 === 'scissors') ||
+                (c1 === 'paper' && c2 === 'rock')
+            ) {
+                return 'p1';
+            }
+            return 'p2';
+        }
+
+        buttons.choices.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!roomRef || currentUser.role === 'spectator') return;
+
+                const choice = btn.getAttribute('data-choice');
+                currentUser.choice = choice;
+
+                try {
+                    await set(ref(db, `rooms/${currentRoomCode}/players/${currentUser.role}/choice`), choice);
+                } catch (err) {
+                    console.error("出拳失敗:", err);
+                }
+            });
+        });
+
+        async function exitRoom(manual = true) {
+            if (roomRef && currentUser.role) {
+                if (manual) {
+                    try {
+                        await remove(ref(db, `rooms/${currentRoomCode}/players/${currentUser.role}`));
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+                if (roomUnsubscribe) {
+                    roomUnsubscribe();
+                }
+            }
+
+            currentRoomCode = null;
+            roomRef = null;
+            currentUser.role = null;
+            currentUser.choice = null;
+
+            switchView('lobby');
+        }
+
+        buttons.leave.addEventListener('click', () => exitRoom(true));
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #EBF3FA;
+            --card-bg: #FFFFFF;
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --primary-light: #EFF6FF;
+            --accent: #60A5FA;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .view {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            height: 52px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0 16px;
+            font-size: 1.125rem;
+            outline: none;
+            transition: all 0.2s;
+            text-align: center;
+            letter-spacing: 2px;
+            background-color: #F8FAFC;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            background-color: #FFFFFF;
+        }
+
+        .btn {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 12px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: #94A3B8;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border-color);
+            box-shadow: none;
+            height: 44px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin: 4px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .room-bar {
+            background-color: var(--primary-light);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .room-info .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .room-info .code {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .player-count-badge {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--primary);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .player-card {
+            background: #F8FAFC;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .player-card.is-me {
+            border-color: var(--accent);
+            background: #F0F7FF;
+        }
+
+        .player-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-size: 0.9375rem;
+            font-weight: 700;
+        }
+
+        .player-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .player-choice-display {
+            font-size: 1.75rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .spectator-box {
+            background-color: #F8FAFC;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-color);
+        }
+
+        .spectator-box strong {
+            color: var(--text-dark);
+        }
+
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-title {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            height: 76px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .choice-btn span.emoji {
+            font-size: 1.75rem;
+        }
+
+        .choice-btn span.label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .choice-btn:not(:disabled):active, .choice-btn.selected {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .choice-btn.selected span.label {
+            color: var(--primary);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-banner {
+            text-align: center;
+            padding: 12px;
+            background-color: var(--primary-light);
+            border-radius: 12px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background-color: #1E293B;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 100;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Toast 通知 -->
+        <div id="toast" class="toast">提示訊息</div>
+
+        <!-- 標頭 -->
+        <div class="header">
+            <h1>剪刀石頭布</h1>
+            <p>線上雙人即時連線對戰</p>
+        </div>
+
+        <!-- 1. 暱稱設定與大廳視圖 -->
+        <div id="view-lobby" class="view active">
+            <div class="input-group">
+                <label for="input-nickname">玩家暱稱</label>
+                <input type="text" id="input-nickname" placeholder="請輸入暱稱" maxlength="8">
+            </div>
+
+            <button class="btn" id="btn-create-room">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                創建新房間 (4位數房號)
+            </button>
+
+            <div class="divider"><span>或是加入已有房間</span></div>
+
+            <div class="input-group">
+                <input type="text" id="input-room-code" placeholder="輸入 4 位數房號" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+            </div>
+
+            <button class="btn btn-secondary" id="btn-join-room">加入房間</button>
+        </div>
+
+        <!-- 2. 遊戲房間視圖 -->
+        <div id="view-room" class="view">
+            <!-- 房間資訊 -->
+            <div class="room-bar">
+                <div class="room-info">
+                    <span class="label">房間號碼</span>
+                    <span class="code" id="display-room-code">----</span>
+                </div>
+                <div class="player-count-badge" id="display-player-count">1 / 3 人</div>
+            </div>
+
+            <!-- 玩家列表看板 -->
+            <div class="game-board">
+                <!-- 玩家 P1 -->
+                <div class="player-card" id="card-p1">
+                    <div class="player-meta">
+                        <div class="avatar" id="p1-avatar">1</div>
+                        <div class="player-info">
+                            <span class="player-name" id="p1-name">等待對手...</span>
+                            <span class="player-status" id="p1-status">未準備</span>
+                        </div>
+                    </div>
+                    <div class="player-choice-display" id="p1-choice">❓</div>
+                </div>
+
+                <!-- 玩家 P2 -->
+                <div class="player-card" id="card-p2">
+                    <div class="player-meta">
+                        <div class="avatar" id="p2-avatar">2</div>
+                        <div class="player-info">
+                            <span class="player-name" id="p2-name">等待對手...</span>
+                            <span class="player-status" id="p2-status">未準備</span>
+                        </div>
+                    </div>
+                    <div class="player-choice-display" id="p2-choice">❓</div>
+                </div>
+            </div>
+
+            <!-- 觀戰者提示 -->
+            <div class="spectator-box" id="box-spectator" style="display: none;">
+                👀 觀戰中：<strong id="spectator-name">無</strong>
+            </div>
+
+            <!-- 結果公告 -->
+            <div class="result-banner" id="display-result">
+                等待兩位玩家出拳...
+            </div>
+
+            <!-- 出拳按鈕區域 -->
+            <div class="action-area" id="area-controls">
+                <div class="action-title" id="action-hint">選擇你的出拳</div>
+                <div class="choices-grid">
+                    <button class="choice-btn" data-choice="scissors">
+                        <span class="emoji">✌️</span>
+                        <span class="label">剪刀</span>
+                    </button>
+                    <button class="choice-btn" data-choice="rock">
+                        <span class="emoji">✊</span>
+                        <span class="label">石頭</span>
+                    </button>
+                    <button class="choice-btn" data-choice="paper">
+                        <span class="emoji">✋</span>
+                        <span class="label">布</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn btn-outline" id="btn-leave-room">離開房間</button>
+        </div>
+    </div>
+</body>
+</html>
