@@ -6,12 +6,12 @@
     <title>線上雙人猜拳對戰</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
     <!-- Firebase SDK (v13.0.0 Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
+        import { getDatabase, ref, set, get, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
 
         // 你的 Firebase 設定
         const firebaseConfig = {
@@ -36,7 +36,7 @@
         let currentUser = {
             id: 'user_' + Math.random().toString(36).substr(2, 9),
             name: '',
-            role: null,
+            role: null, // 'p1', 'p2', or 'spectator'
             choice: null
         };
 
@@ -121,7 +121,9 @@
             return name;
         }
 
-        // 創建房間
+        // ==========================================
+        // 創建新房間
+        // ==========================================
         buttons.create.addEventListener('click', async () => {
             if (!validateNickname()) return;
 
@@ -150,12 +152,14 @@
                 currentUser.role = 'p1';
                 enterRoom(code);
             } catch (err) {
-                showToast('建立失敗，請確認 Firebase 資料庫連線');
+                showToast('建立失敗，請檢查 Firebase 資料庫權限');
                 console.error(err);
             }
         });
 
+        // ==========================================
         // 加入房間
+        // ==========================================
         buttons.join.addEventListener('click', async () => {
             if (!validateNickname()) return;
 
@@ -202,17 +206,20 @@
 
                 enterRoom(code);
             } catch (err) {
-                showToast('加入失敗，請稍後再試');
+                showToast('加入房間失敗，請稍後再試');
                 console.error(err);
             }
         });
 
+        // ==========================================
+        // 進入房間與即時監聽
+        // ==========================================
         function enterRoom(code) {
             currentRoomCode = code;
             displays.roomCode.textContent = code;
             roomRef = ref(db, `rooms/${code}`);
 
-            // 開始監聽房間
+            // 開啟即時監聽
             roomUnsubscribe = onValue(roomRef, (snapshot) => {
                 if (!snapshot.exists()) {
                     showToast('房間已關閉');
@@ -223,9 +230,12 @@
             });
 
             switchView('room');
-            showToast(`已進入房間 ${code}`);
+            showToast(`已成功進入房間 ${code}`);
         }
 
+        // ==========================================
+        // UI 更新與勝負判定
+        // ==========================================
         function updateRoomUI(data) {
             const players = data.players || {};
             const p1 = players.p1;
@@ -334,6 +344,9 @@
             return 'p2';
         }
 
+        // ==========================================
+        // 點選出拳
+        // ==========================================
         buttons.choices.forEach(btn => {
             btn.addEventListener('click', async () => {
                 if (!roomRef || currentUser.role === 'spectator') return;
@@ -344,11 +357,14 @@
                 try {
                     await set(ref(db, `rooms/${currentRoomCode}/players/${currentUser.role}/choice`), choice);
                 } catch (err) {
-                    console.error("出拳失敗:", err);
+                    console.error("出拳同步失敗:", err);
                 }
             });
         });
 
+        // ==========================================
+        // 離開房間
+        // ==========================================
         async function exitRoom(manual = true) {
             if (roomRef && currentUser.role) {
                 if (manual) {
