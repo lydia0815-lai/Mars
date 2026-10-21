@@ -1,189 +1,349 @@
-# Create index.html file with embedded Firebase config and game code
-
-html_content = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>清新猜拳大對決 - 多人連線版</title>
+    <title>海洋猜拳大戰 - Rock Paper Scissors</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        ocean: {
+                            deep: '#030c1e',
+                            dark: '#0a192f',
+                            card: 'rgba(15, 32, 67, 0.65)',
+                            lightCard: 'rgba(255, 255, 255, 0.08)',
+                            cyan: '#00f2fe',
+                            blue: '#4facfe',
+                            teal: '#00d2ff'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-        
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            background: linear-gradient(135deg, #020b18 0%, #0a192f 50%, #062042 100%);
             min-height: 100vh;
-            user-select: none;
-            -webkit-user-select: none;
+            color: #f0f6fc;
+            overflow-x: hidden;
         }
 
+        /* Glassmorphism Styles */
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);
+            background: rgba(10, 25, 47, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 242, 254, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .btn-choice {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .glass-btn {
+            background: rgba(79, 172, 254, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn-choice:active {
-            transform: scale(0.92);
+        .glass-btn:hover:not(:disabled) {
+            background: rgba(0, 242, 254, 0.3);
+            border-color: rgba(0, 242, 254, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
 
-        .btn-choice.selected {
-            border-color: #0284c7;
-            background-color: #e0f2fe;
+        .glass-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, rgba(15, 32, 67, 0.8) 0%, rgba(6, 32, 66, 0.9) 100%);
+            border: 2px solid rgba(0, 242, 254, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
             transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
         }
 
-        /* Pulse Animation for Waiting */
-        @keyframes custom-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(0.98); }
+        .choice-btn.selected {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(79, 172, 254, 0.4) 100%);
+            border-color: #00f2fe;
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
+            transform: scale(1.08);
         }
 
-        .animate-waiting {
-            animation: custom-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        #canvas-fx {
+        /* Floating Animated Bubbles */
+        .bubble-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            z-index: 50;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -50px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(0, 242, 254, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: rise 12s infinite ease-in-out;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-110vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glowing Effects */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .glow-box {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 25, 47, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.3);
+            border-radius: 3px;
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4 relative overflow-x-hidden">
+<body class="flex flex-col min-h-screen relative font-sans antialiased selection:bg-cyan-500 selection:text-white">
 
-    <!-- Canvas 特效層 -->
-    <canvas id="canvas-fx"></canvas>
+    <!-- Background Bubble Animations -->
+    <div class="bubble-container" id="bubbleContainer"></div>
 
-    <!-- 主容器 -->
-    <main class="w-full max-w-md relative z-10">
+    <!-- Main Container -->
+    <div class="relative z-10 flex-1 flex flex-col justify-between max-w-md w-full mx-auto p-4 sm:p-6">
         
-        <!-- 頂部 Header -->
-        <header class="text-center mb-6">
-            <div class="inline-block p-3 rounded-2xl bg-white/60 backdrop-blur-md mb-2 shadow-sm">
-                <i class="fa-solid fa-hand-scissors text-sky-500 text-3xl"></i>
+        <!-- Header -->
+        <header class="text-center my-3">
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-teal-200 glow-text flex items-center justify-center gap-2">
+                <i class="fa-solid font-normal text-cyan-400 fa-hand-back-fist"></i>
+                <i class="fa-solid font-normal text-blue-400 fa-hand"></i>
+                <i class="fa-solid font-normal text-teal-300 fa-hand-scissors"></i>
+            </h1>
+            <div id="connectionBadge" class="inline-flex items-center gap-2 px-3 py-1 mt-2 rounded-full text-xs font-semibold glass-card border border-cyan-500/30 text-cyan-300">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="statusDot"></span>
+                <span id="statusText">未設定 Firebase</span>
             </div>
-            <h1 class="text-2xl font-bold text-sky-900 tracking-wide">清新猜拳大對決</h1>
-            <p class="text-xs text-sky-600 mt-1">即時連線 ‧ 2~3人對戰 ‧ 藍色質感體驗</p>
         </header>
 
-        <!-- View 1: 登入/設定暱稱 & 主選單 -->
-        <section id="view-lobby" class="glass-card rounded-3xl p-6 mb-4">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-sky-800 mb-1">你的暱稱</label>
-                    <input type="text" id="input-nickname" placeholder="請輸入暱稱..." maxlength="10"
-                        class="w-full px-4 py-3 rounded-xl border border-sky-200 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sky-900 text-center font-bold bg-white/80">
-                </div>
+        <!-- Dynamic Content Screens -->
+        <main class="flex-1 flex flex-col justify-center my-2">
 
-                <div class="pt-2 grid grid-cols-1 gap-3">
-                    <button id="btn-create-room" 
-                        class="w-full py-3.5 px-4 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus"></i> 建立 4 位數房間
-                    </button>
-                    
-                    <div class="relative flex py-1 items-center">
-                        <div class="flex-grow border-t border-sky-200"></div>
-                        <span class="flex-shrink mx-3 text-xs text-sky-400">或輸入房號加入</span>
-                        <div class="flex-grow border-t border-sky-200"></div>
+            <!-- LOBBY SCREEN -->
+            <div id="lobbyScreen" class="glass-card rounded-3xl p-6 shadow-2xl transition-all duration-300">
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-cyan-300 uppercase tracking-wider mb-2">玩家暱稱</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/60"></i>
+                            <input type="text" id="nicknameInput" maxlength="10" placeholder="輸入您的暱稱"
+                                class="w-full bg-ocean-dark/80 border border-cyan-500/30 rounded-2xl py-3 pl-11 pr-4 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-base">
+                        </div>
                     </div>
 
-                    <div class="flex gap-2">
-                        <input type="number" id="input-room-id" placeholder="4 位數房號" pattern="[0-9]*" inputmode="numeric" maxlength="4"
-                            class="w-2/3 px-4 py-3 rounded-xl border border-sky-200 text-center text-lg font-bold text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white/80">
-                        <button id="btn-join-room" 
-                            class="w-1/3 py-3 bg-sky-100 hover:bg-sky-200 active:bg-sky-300 text-sky-700 font-bold rounded-xl border border-sky-300 transition-all">
-                            加入
+                    <div class="pt-2">
+                        <label class="block text-xs font-semibold text-cyan-300 uppercase tracking-wider mb-2">選擇遊戲人數</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="cap2Btn" onclick="selectCapacity(2)" class="glass-btn py-2.5 rounded-xl text-sm font-bold border-cyan-400/60 bg-cyan-500/20 text-cyan-300">
+                                <i class="fa-solid fa-user-group mr-1.5"></i> 2 人對決
+                            </button>
+                            <button type="button" id="cap3Btn" onclick="selectCapacity(3)" class="glass-btn py-2.5 rounded-xl text-sm font-bold opacity-60 text-slate-300">
+                                <i class="fa-solid fa-users mr-1.5"></i> 3 人亂鬥
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <button onclick="createRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-lg shadow-lg shadow-cyan-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> 建立房間
+                        </button>
+
+                        <div class="relative flex py-1 items-center">
+                            <div class="flex-grow border-t border-cyan-500/20"></div>
+                            <span class="flex-shrink mx-3 text-xs text-slate-400 uppercase tracking-widest">或輸入房號</span>
+                            <div class="flex-grow border-t border-cyan-500/20"></div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <input type="number" id="roomCodeInput" pattern="\d*" maxlength="4" placeholder="4位房號"
+                                oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);"
+                                class="w-1/2 bg-ocean-dark/80 border border-cyan-500/30 rounded-2xl px-4 text-center font-mono text-xl tracking-widest text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+                            <button onclick="joinRoom()" class="w-1/2 glass-btn py-3.5 px-4 rounded-2xl text-cyan-300 font-bold text-base active:scale-[0.98] transition-all">
+                                加入房間 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME ROOM SCREEN -->
+            <div id="gameScreen" class="hidden flex-col gap-4 transition-all duration-300">
+                
+                <!-- Room Info Bar -->
+                <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs text-cyan-400 font-medium">房間號碼</div>
+                        <div class="flex items-center gap-2">
+                            <span id="displayRoomCode" class="font-mono text-2xl font-bold tracking-wider text-white">----</span>
+                            <button onclick="copyRoomCode()" title="複製房號" class="text-cyan-400 hover:text-white transition-colors p-1 text-sm">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-cyan-400 font-medium">玩家人數</div>
+                        <div class="font-bold text-lg text-white">
+                            <span id="playerCount">0</span> / <span id="maxCapacity">2</span>
+                        </div>
+                    </div>
+                    <button onclick="leaveRoom()" class="px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-semibold hover:bg-red-500/40 transition-all">
+                        離開
+                    </button>
+                </div>
+
+                <!-- Players List & Status -->
+                <div class="glass-card rounded-2xl p-4">
+                    <div class="text-xs text-slate-300 font-semibold mb-3 flex items-center justify-between">
+                        <span>房間成員狀態</span>
+                        <span id="roundCounterText" class="text-cyan-300 font-mono">ROUND 1</span>
+                    </div>
+                    <div id="playersList" class="space-y-2">
+                        <!-- Player Items injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- Game Result Area -->
+                <div id="resultBanner" class="glass-card rounded-2xl p-4 text-center hidden animate-fade-in border-2 border-cyan-400/50">
+                    <div id="resultTitle" class="text-2xl font-black mb-1 glow-text">--</div>
+                    <div id="resultDesc" class="text-sm text-slate-300">--</div>
+                </div>
+
+                <!-- Choice Controls -->
+                <div class="glass-card rounded-3xl p-5 text-center">
+                    <div id="choiceHint" class="text-sm font-semibold text-cyan-300 mb-4">請選擇出拳：</div>
+                    
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <button onclick="makeChoice('rock')" id="btn-rock" class="choice-btn p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                            <span class="text-4xl sm:text-5xl group-hover:scale-110 transition-transform">✊</span>
+                            <span class="text-xs font-bold text-slate-200">石頭</span>
+                        </button>
+                        <button onclick="makeChoice('scissors')" id="btn-scissors" class="choice-btn p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                            <span class="text-4xl sm:text-5xl group-hover:scale-110 transition-transform">✌️</span>
+                            <span class="text-xs font-bold text-slate-200">剪刀</span>
+                        </button>
+                        <button onclick="makeChoice('paper')" id="btn-paper" class="choice-btn p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                            <span class="text-4xl sm:text-5xl group-hover:scale-110 transition-transform">🖐️</span>
+                            <span class="text-xs font-bold text-slate-200">布</span>
                         </button>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- View 2: 房間與遊戲對戰區 (預設隱藏) -->
-        <section id="view-game" class="glass-card rounded-3xl p-6 hidden">
-            
-            <!-- 頂部資訊列 -->
-            <div class="flex justify-between items-center mb-4 pb-3 border-b border-sky-100">
-                <div>
-                    <span class="text-xs text-sky-500 font-semibold block">房號</span>
-                    <span id="display-room-id" class="text-xl font-extrabold text-sky-900 tracking-wider">----</span>
+                    <button id="nextRoundBtn" onclick="resetRound()" class="hidden w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-base shadow-lg shadow-cyan-500/20 active:scale-95 transition-all">
+                        下一局 <i class="fa-solid fa-rotate-right ml-1"></i>
+                    </button>
                 </div>
-                <div class="text-center">
-                    <span class="text-xs text-sky-500 font-semibold block">局數</span>
-                    <span id="display-round" class="text-sm font-bold text-sky-800">第 1 局</span>
-                </div>
-                <button id="btn-leave-room" class="text-xs text-rose-500 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 transition-all font-semibold">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> 離開
+
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center text-xs text-slate-400 py-2">
+            <div class="flex items-center justify-center gap-2">
+                <button onclick="openConfigModal()" class="hover:text-cyan-300 underline transition-colors">
+                    <i class="fa-solid fa-gear"></i> 設定 Firebase Config
                 </button>
             </div>
+        </footer>
 
-            <!-- 玩家狀態看板 (最多3人) -->
-            <div class="mb-5 space-y-2" id="players-container">
-                <!-- 玩家列表動態生成 -->
-            </div>
+    </div>
 
-            <!-- 遊戲互動區 -->
-            <div id="game-action-area" class="text-center my-6">
-                <!-- 狀態訊息 -->
-                <p id="game-status-text" class="text-sm font-bold text-sky-700 mb-4 animate-waiting">
-                    等待其他玩家加入 (2~3人即可開打)...
-                </p>
+    <!-- Firebase Config Modal -->
+    <div id="configModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 border border-cyan-400/40 relative max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-cyan-300 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-database"></i> 設定 Firebase 連線
+            </h3>
+            <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+                若尚未在程式碼內填寫，請貼上您的 Firebase Realtime Database 設定 JSON 或參數物件：
+            </p>
+            <textarea id="configJsonInput" rows="7" placeholder='{
+  "apiKey": "YOUR_API_KEY",
+  "authDomain": "YOUR_PROJECT.firebaseapp.com",
+  "databaseURL": "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  "projectId": "YOUR_PROJECT",
+  "storageBucket": "YOUR_PROJECT.appspot.com",
+  "messagingSenderId": "...",
+  "appId": "..."
+}' class="w-full bg-ocean-dark border border-cyan-500/30 rounded-xl p-3 font-mono text-xs text-cyan-200 placeholder-slate-600 focus:outline-none focus:border-cyan-400 mb-4"></textarea>
 
-                <!-- 猜拳選擇按鈕 (剪刀/石頭/布) -->
-                <div id="choice-buttons" class="grid grid-cols-3 gap-3 hidden">
-                    <button data-choice="rock" class="btn-choice flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-sky-100 shadow-sm hover:border-sky-300">
-                        <span class="text-4xl mb-1">✊</span>
-                        <span class="text-xs font-bold text-sky-800">石頭</span>
-                    </button>
-                    <button data-choice="scissors" class="btn-choice flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-sky-100 shadow-sm hover:border-sky-300">
-                        <span class="text-4xl mb-1">✌️</span>
-                        <span class="text-xs font-bold text-sky-800">剪刀</span>
-                    </button>
-                    <button data-choice="paper" class="btn-choice flex flex-col items-center justify-center p-4 bg-white rounded-2xl border-2 border-sky-100 shadow-sm hover:border-sky-300">
-                        <span class="text-4xl mb-1">🖐️</span>
-                        <span class="text-xs font-bold text-sky-800">布</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 開牌結果區域 -->
-            <div id="result-area" class="hidden text-center bg-sky-50/80 p-4 rounded-2xl border border-sky-200">
-                <h3 id="result-title" class="text-lg font-black text-sky-900 mb-1">平手！</h3>
-                <p id="result-detail" class="text-xs text-sky-600 mb-3">大家出了一模一樣的拳</p>
-                <button id="btn-next-round" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl shadow transition-all text-sm">
-                    下一局
+            <div class="flex gap-2">
+                <button onclick="saveManualConfig()" class="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold text-sm text-white hover:opacity-90 transition-opacity">
+                    儲存並建立連線
+                </button>
+                <button onclick="closeConfigModal()" class="px-4 py-3 glass-btn rounded-xl font-bold text-sm text-slate-300">
+                    關閉
                 </button>
             </div>
-
-        </section>
-
-        <!-- 提示 Toast -->
-        <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-sky-900/90 text-white text-xs py-2 px-4 rounded-full shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50">
-            提示訊息
         </div>
+    </div>
 
-    </main>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 glass-card px-4 py-2.5 rounded-2xl text-xs font-semibold text-cyan-200 border border-cyan-400/40 shadow-xl opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2">
+        <i class="fa-solid fa-circle-info text-cyan-400" id="toastIcon"></i>
+        <span id="toastMsg">提示訊息</span>
+    </div>
 
-    <!-- Firebase SDK (ES Module) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, update, onValue, off, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <!-- Firebase SDK (Compat version for simplicity in browser) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-        // 你的 Firebase 配置資訊
+    <script>
+        /* 
+         * =========================================================================
+         *  FIREBASE CONFIGURATION
+         * =========================================================================
+         */
         const firebaseConfig = {
             apiKey: "AIzaSyD_XwMWXpUg3OJZBLx0e1A2LKNFl3mpnn8",
             authDomain: "project-9055340413398078399.firebaseapp.com",
@@ -194,417 +354,580 @@ html_content = '''<!DOCTYPE html>
             appId: "1:984429802835:web:038d4191feb28d93259da6",
             measurementId: "G-Z5D344VKHP"
         };
+        /* ========================================================================= */
 
-        // 初始化 Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // 本地狀態
-        let myPlayerId = 'p_' + Math.random().toString(36).substr(2, 9);
-        let myNickname = '';
-        let currentRoomId = null;
+        // Global Game State
+        let db = null;
+        let playerId = getOrGeneratePlayerId();
+        let currentRoomCode = null;
+        let playerRef = null;
         let roomRef = null;
-        let roomListener = null;
+        let selectedCapacity = 2;
+        let currentChoice = null;
 
-        // UI 元素
-        const viewLobby = document.getElementById('view-lobby');
-        const viewGame = document.getElementById('view-game');
-        const inputNickname = document.getElementById('input-nickname');
-        const inputRoomId = document.getElementById('input-room-id');
-        const btnCreateRoom = document.getElementById('btn-create-room');
-        const btnJoinRoom = document.getElementById('btn-join-room');
-        const btnLeaveRoom = document.getElementById('btn-leave-room');
-        const displayRoomId = document.getElementById('display-room-id');
-        const displayRound = document.getElementById('display-round');
-        const playersContainer = document.getElementById('players-container');
-        const gameStatusText = document.getElementById('game-status-text');
-        const choiceButtons = document.getElementById('choice-buttons');
-        const resultArea = document.getElementById('result-area');
-        const resultTitle = document.getElementById('result-title');
-        const resultDetail = document.getElementById('result-detail');
-        const btnNextRound = document.getElementById('btn-next-round');
-
-        // Toast 提示
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.remove('opacity-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-            }, 2500);
-        }
-
-        // 讀取/儲存預設暱稱
-        const savedName = localStorage.getItem('rps_nickname');
-        if (savedName) inputNickname.value = savedName;
-
-        function getValidNickname() {
-            const name = inputNickname.value.trim();
-            if (!name) {
-                showToast('請先輸入暱稱！');
-                inputNickname.focus();
-                return null;
-            }
-            localStorage.setItem('rps_nickname', name);
-            return name;
-        }
-
-        // 產生 4 位數隨機房號
-        function generateRoomId() {
-            return Math.floor(1000 + Math.random() * 9000).toString();
-        }
-
-        // 建立房間
-        btnCreateRoom.addEventListener('click', async () => {
-            const name = getValidNickname();
-            if (!name) return;
-            myNickname = name;
-
-            const roomId = generateRoomId();
-            const newRoomRef = ref(db, `rooms/${roomId}`);
-
-            const roomData = {
-                status: 'waiting',
-                round: 1,
-                players: {
-                    [myPlayerId]: {
-                        id: myPlayerId,
-                        name: myNickname,
-                        score: 0,
-                        choice: '',
-                        isReady: true
-                    }
-                }
-            };
-
-            try {
-                await set(newRoomRef, roomData);
-                enterRoom(roomId);
-            } catch (err) {
-                console.error(err);
-                showToast('建立房間失敗，請稍後再試');
-            }
+        // Initialize App on DOM Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initBubbles();
+            checkFirebaseConfig();
+            
+            // Random default nickname
+            const defaultNames = ['深海神蝦', '炫彩水母', '霸王烏賊', '深海狂鯊', '海豚勇士', '熱帶小魚'];
+            const randomName = defaultNames[Math.floor(Math.random() * defaultNames.length)];
+            document.getElementById('nicknameInput').value = randomName;
         });
 
-        // 加入房間
-        btnJoinRoom.addEventListener('click', async () => {
-            const name = getValidNickname();
-            if (!name) return;
-            myNickname = name;
+        // Initialize Bubble Animation
+        function initBubbles() {
+            const container = document.getElementById('bubbleContainer');
+            const bubbleCount = 15;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 25 + 8;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.animationDuration = `${Math.random() * 8 + 7}s`;
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(bubble);
+            }
+        }
 
-            const roomId = inputRoomId.value.trim();
-            if (!/^[0-9]{4}$/.test(roomId)) {
-                showToast('請輸入 4 位數字房號');
+        // Get or Create Persistent Unique Player Id
+        function getOrGeneratePlayerId() {
+            let id = sessionStorage.getItem('rps_player_id');
+            if (!id) {
+                id = 'user_' + Math.random().toString(36).substring(2, 9);
+                sessionStorage.setItem('rps_player_id', id);
+            }
+            return id;
+        }
+
+        // Check and Initialize Firebase
+        function checkFirebaseConfig() {
+            const savedConfig = localStorage.getItem('rps_firebase_config');
+            let configToUse = null;
+
+            if (savedConfig) {
+                try {
+                    configToUse = JSON.parse(savedConfig);
+                } catch(e) {
+                    console.error("Invalid saved config");
+                }
+            }
+
+            if (!configToUse && firebaseConfig && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                configToUse = firebaseConfig;
+            }
+
+            if (configToUse && configToUse.databaseURL && !configToUse.databaseURL.includes("YOUR_DATABASE_URL")) {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(configToUse);
+                    }
+                    db = firebase.database();
+                    updateConnectionBadge(true, "連線成功");
+                } catch (err) {
+                    console.error("Firebase Initialization Error:", err);
+                    updateConnectionBadge(false, "設定錯誤");
+                }
+            } else {
+                updateConnectionBadge(false, "未填寫 Firebase");
+            }
+        }
+
+        function updateConnectionBadge(connected, text) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            if (connected) {
+                statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+                statusText.innerText = text;
+                statusText.className = "text-emerald-300";
+            } else {
+                statusDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+                statusText.innerText = text;
+                statusText.className = "text-amber-300";
+            }
+        }
+
+        // Modal Logic
+        function openConfigModal() {
+            document.getElementById('configModal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+        }
+
+        function saveManualConfig() {
+            const input = document.getElementById('configJsonInput').value.trim();
+            if (!input) {
+                showToast("請輸入 Valid JSON 設定");
+                return;
+            }
+            try {
+                const parsed = JSON.parse(input);
+                if (!parsed.databaseURL) {
+                    showToast("JSON 缺少 databaseURL");
+                    return;
+                }
+                localStorage.setItem('rps_firebase_config', JSON.stringify(parsed));
+                closeConfigModal();
+                checkFirebaseConfig();
+                showToast("Firebase 設定已儲存並載入");
+            } catch (err) {
+                showToast("JSON 格式不正確，請重新檢查");
+            }
+        }
+
+        // Selection for Room Capacity
+        function selectCapacity(cap) {
+            selectedCapacity = cap;
+            const cap2Btn = document.getElementById('cap2Btn');
+            const cap3Btn = document.getElementById('cap3Btn');
+
+            if (cap === 2) {
+                cap2Btn.className = "glass-btn py-2.5 rounded-xl text-sm font-bold border-cyan-400/60 bg-cyan-500/20 text-cyan-300";
+                cap3Btn.className = "glass-btn py-2.5 rounded-xl text-sm font-bold opacity-60 text-slate-300";
+            } else {
+                cap3Btn.className = "glass-btn py-2.5 rounded-xl text-sm font-bold border-cyan-400/60 bg-cyan-500/20 text-cyan-300";
+                cap2Btn.className = "glass-btn py-2.5 rounded-xl text-sm font-bold opacity-60 text-slate-300";
+            }
+        }
+
+        // Room Management Logic
+        function createRoom() {
+            if (!verifyFirebase()) return;
+
+            const name = getPlayerName();
+            if (!name) return;
+
+            // Generate 4-digit room code
+            const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+            const rRef = db.ref('rooms/' + roomCode);
+
+            rRef.once('value').then(snapshot => {
+                if (snapshot.exists()) {
+                    // Retry if code collision
+                    createRoom();
+                } else {
+                    const roomData = {
+                        capacity: selectedCapacity,
+                        status: 'waiting', // waiting, active, finished
+                        round: 1,
+                        createdAt: Date.now()
+                    };
+
+                    rRef.set(roomData).then(() => {
+                        joinRoomWithCode(roomCode, name);
+                    });
+                }
+            }).catch(err => {
+                showToast("建立房間失敗：" + err.message);
+            });
+        }
+
+        function joinRoom() {
+            if (!verifyFirebase()) return;
+
+            const name = getPlayerName();
+            if (!name) return;
+
+            const codeInput = document.getElementById('roomCodeInput').value.trim();
+            if (codeInput.length !== 4) {
+                showToast("請輸入 4 位數房號");
                 return;
             }
 
-            const targetRoomRef = ref(db, `rooms/${roomId}`);
-            try {
-                const snapshot = await get(targetRoomRef);
+            joinRoomWithCode(codeInput, name);
+        }
+
+        function joinRoomWithCode(roomCode, name) {
+            const rRef = db.ref('rooms/' + roomCode);
+
+            rRef.once('value').then(snapshot => {
                 if (!snapshot.exists()) {
-                    showToast('找不到該房間！');
+                    showToast("找不到此房號！");
                     return;
                 }
 
                 const room = snapshot.val();
-                const playerKeys = Object.keys(room.players || {});
+                const players = room.players || {};
+                const playerCount = Object.keys(players).length;
 
-                if (playerKeys.length >= 3) {
-                    showToast('房間人數已滿 (最多3人)！');
+                // Check if player already in room or room full
+                if (!players[playerId] && playerCount >= room.capacity) {
+                    showToast("房間人數已滿！");
                     return;
                 }
 
-                // 加入玩家
-                await update(ref(db, `rooms/${roomId}/players/${myPlayerId}`), {
-                    id: myPlayerId,
-                    name: myNickname,
-                    score: 0,
-                    choice: '',
-                    isReady: true
+                // Add or update player in room
+                const pRef = db.ref(`rooms/${roomCode}/players/${playerId}`);
+                pRef.set({
+                    id: playerId,
+                    name: name,
+                    score: (players[playerId] && players[playerId].score) || 0,
+                    choice: null,
+                    joinedAt: Date.now()
+                }).then(() => {
+                    // Setup disconnect handler
+                    pRef.onDisconnect().remove();
+
+                    currentRoomCode = roomCode;
+                    roomRef = rRef;
+                    playerRef = pRef;
+
+                    switchToGameUI(roomCode);
+                    listenToRoomUpdates();
                 });
 
-                enterRoom(roomId);
-            } catch (err) {
-                console.error(err);
-                showToast('加入房間失敗，請檢查網路');
-            }
-        });
-
-        // 進入房間介面並綁定即時監聽
-        function enterRoom(roomId) {
-            currentRoomId = roomId;
-            displayRoomId.innerText = roomId;
-            
-            viewLobby.classList.add('hidden');
-            viewGame.classList.remove('hidden');
-
-            roomRef = ref(db, `rooms/${roomId}`);
-            
-            // 監聽房間資料更新
-            roomListener = onValue(roomRef, (snapshot) => {
-                if (!snapshot.exists()) {
-                    showToast('房間已關閉');
-                    leaveRoom();
-                    return;
-                }
-                const roomData = snapshot.val();
-                renderGame(roomData);
+            }).catch(err => {
+                showToast("加入房間出錯：" + err.message);
             });
         }
 
-        // 離開房間
         function leaveRoom() {
-            if (currentRoomId && roomRef) {
-                // 解除監聽
-                if (roomListener) off(roomRef);
-
-                // 移除自己在房間中的資料
-                remove(ref(db, `rooms/${currentRoomId}/players/${myPlayerId}`));
+            if (playerRef) {
+                playerRef.onDisconnect().cancel();
+                playerRef.remove().then(() => {
+                    cleanupGameSession();
+                });
+            } else {
+                cleanupGameSession();
             }
-
-            currentRoomId = null;
-            roomRef = null;
-            viewGame.classList.add('hidden');
-            viewLobby.classList.remove('hidden');
-            resetChoiceUI();
         }
 
-        btnLeaveRoom.addEventListener('click', leaveRoom);
+        function cleanupGameSession() {
+            if (roomRef) {
+                roomRef.off();
+            }
+            currentRoomCode = null;
+            playerRef = null;
+            roomRef = null;
+            currentChoice = null;
 
-        // 渲染遊戲狀態
-        function renderGame(room) {
-            displayRound.innerText = `第 ${room.round || 1} 局`;
-            const players = room.players || {};
-            const playerList = Object.values(players);
-            
-            // 渲染玩家列表
-            playersContainer.innerHTML = '';
-            playerList.forEach(p => {
-                const isMe = p.id === myPlayerId;
-                const hasChosen = p.choice && p.choice !== '';
-                
-                let choiceEmoji = '❓';
-                if (room.status === 'revealed' && p.choice) {
-                    if (p.choice === 'rock') choiceEmoji = '✊';
-                    if (p.choice === 'scissors') choiceEmoji = '✌️';
-                    if (p.choice === 'paper') choiceEmoji = '🖐️';
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('lobbyScreen').classList.remove('hidden');
+            showToast("已離開房間");
+        }
+
+        function verifyFirebase() {
+            if (!db) {
+                openConfigModal();
+                showToast("請先完成 Firebase 設定");
+                return false;
+            }
+            return true;
+        }
+
+        function getPlayerName() {
+            const name = document.getElementById('nicknameInput').value.trim();
+            if (!name) {
+                showToast("請輸入玩家暱稱");
+                return null;
+            }
+            return name;
+        }
+
+        function switchToGameUI(code) {
+            document.getElementById('lobbyScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+            document.getElementById('displayRoomCode').innerText = code;
+        }
+
+        // Room Sync & Listener
+        function listenToRoomUpdates() {
+            if (!roomRef) return;
+
+            roomRef.on('value', snapshot => {
+                const room = snapshot.val();
+                if (!room) {
+                    showToast("房間已被關閉");
+                    cleanupGameSession();
+                    return;
                 }
 
-                const playerEl = document.createElement('div');
-                playerEl.className = `flex items-center justify-between p-3 rounded-2xl ${isMe ? 'bg-sky-100/90 border-2 border-sky-300' : 'bg-white/80 border border-sky-100'} shadow-sm`;
-                playerEl.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-sky-400 text-white flex items-center justify-center font-bold text-xs">
-                            ${p.name.charAt(0).toUpperCase()}
+                const players = room.players || {};
+                const playerListKeys = Object.keys(players);
+                const count = playerListKeys.length;
+                const capacity = room.capacity || 2;
+
+                document.getElementById('playerCount').innerText = count;
+                document.getElementById('maxCapacity').innerText = capacity;
+                document.getElementById('roundCounterText').innerText = `ROUND ${room.round || 1}`;
+
+                // Update Players List UI
+                renderPlayersList(players, room.capacity);
+
+                // Check if all players have chosen
+                let chosenCount = 0;
+                playerListKeys.forEach(k => {
+                    if (players[k].choice) chosenCount++;
+                });
+
+                // Check Round Outcome
+                if (count === capacity && chosenCount === capacity) {
+                    // Everyone has made a choice
+                    evaluateRoundResults(players, room.round || 1);
+                } else {
+                    // Waiting for players choices
+                    document.getElementById('resultBanner').classList.add('hidden');
+                    document.getElementById('nextRoundBtn').classList.add('hidden');
+                    
+                    if (count < capacity) {
+                        document.getElementById('choiceHint').innerText = "等待其他玩家加入...";
+                        toggleChoiceButtons(false);
+                    } else {
+                        if (players[playerId] && players[playerId].choice) {
+                            document.getElementById('choiceHint').innerText = "等待其他玩家選擇...";
+                            toggleChoiceButtons(false);
+                        } else {
+                            document.getElementById('choiceHint').innerText = "請選擇出拳：";
+                            toggleChoiceButtons(true);
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPlayersList(players, maxCap) {
+            const listContainer = document.getElementById('playersList');
+            listContainer.innerHTML = '';
+
+            const keys = Object.keys(players);
+
+            keys.forEach(k => {
+                const p = players[k];
+                const isMe = p.id === playerId;
+                const hasChosen = p.choice !== null && p.choice !== undefined;
+
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl flex items-center justify-between border ${isMe ? 'bg-cyan-500/10 border-cyan-400/50' : 'bg-ocean-lightCard border-cyan-500/10'}`;
+
+                let choiceDisplay = `<span class="text-xs px-2.5 py-1 rounded-lg ${hasChosen ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-700/40 text-slate-400'}">${hasChosen ? '已出拳 ✓' : '思考中...'}</span>`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-xs text-white shadow-md">
+                            ${p.name.substring(0, 1).toUpperCase()}
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-sky-900">${p.name} ${isMe ? '<span class="text-[10px] text-sky-500">(你)</span>' : ''}</div>
-                            <div class="text-[10px] text-sky-600">得分: <span class="font-bold text-sky-800">${p.score || 0}</span></div>
+                            <div class="text-sm font-bold text-white flex items-center gap-1.5">
+                                ${escapeHtml(p.name)}
+                                ${isMe ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/30 text-cyan-300">你</span>' : ''}
+                            </div>
+                            <div class="text-xs text-cyan-400 font-mono">得分: ${p.score || 0}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        ${room.status === 'revealed' 
-                            ? `<span class="text-2xl">${choiceEmoji}</span>`
-                            : `<span class="text-xs px-2 py-1 rounded-md font-semibold ${hasChosen ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">
-                                ${hasChosen ? '已出拳' : '思考中...'}
-                               </span>`
-                        }
+                    <div>
+                        ${choiceDisplay}
                     </div>
                 `;
-                playersContainer.appendChild(playerEl);
+                listContainer.appendChild(card);
             });
 
-            // 邏輯控制: 人數與遊戲階段
-            if (playerList.length < 2) {
-                gameStatusText.innerText = "等待其他玩家加入 (2~3人即可開打)...";
-                gameStatusText.classList.add('animate-waiting');
-                choiceButtons.classList.add('hidden');
-                resultArea.classList.add('hidden');
-                return;
-            }
-
-            // 人數足夠，檢查出拳狀態
-            gameStatusText.classList.remove('animate-waiting');
-
-            if (room.status === 'waiting' || room.status === 'playing') {
-                resultArea.classList.add('hidden');
-                choiceButtons.classList.remove('hidden');
-
-                const myData = players[myPlayerId];
-                if (myData && myData.choice) {
-                    gameStatusText.innerText = "你已完成出拳，等待其他玩家...";
-                } else {
-                    gameStatusText.innerText = "請選擇你的拳型！";
-                }
-
-                // 判斷是否所有玩家都已出拳
-                const allChosen = playerList.every(p => p.choice && p.choice !== '');
-                if (allChosen && room.status !== 'revealed') {
-                    // 觸發開牌與計分
-                    calculateAndReveal(room);
-                }
-            } else if (room.status === 'revealed') {
-                choiceButtons.classList.add('hidden');
-                resultArea.classList.remove('hidden');
-                gameStatusText.innerText = "本局結果如下：";
+            // Show empty slots
+            for (let i = keys.length; i < maxCap; i++) {
+                const emptyCard = document.createElement('div');
+                emptyCard.className = "p-3 rounded-xl flex items-center justify-between border border-dashed border-slate-600/50 bg-ocean-dark/30";
+                emptyCard.innerHTML = `
+                    <div class="flex items-center gap-2.5 text-slate-500">
+                        <div class="w-8 h-8 rounded-full border border-dashed border-slate-600 flex items-center justify-center text-xs">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </div>
+                        <span class="text-xs italic">等待加入...</span>
+                    </div>
+                `;
+                listContainer.appendChild(emptyCard);
             }
         }
 
-        // 選擇剪刀石頭布
-        document.querySelectorAll('.btn-choice').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const choice = btn.dataset.choice;
-                
-                // UI 標示
-                document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
+        // Gameplay Interaction
+        function makeChoice(choice) {
+            if (!currentRoomCode || !playerRef) return;
 
-                if (currentRoomId) {
-                    await update(ref(db, `rooms/${currentRoomId}/players/${myPlayerId}`), {
-                        choice: choice
-                    });
-                    await update(ref(db, `rooms/${currentRoomId}`), {
-                        status: 'playing'
-                    });
+            currentChoice = choice;
+
+            // Highlight choice button
+            ['rock', 'scissors', 'paper'].forEach(type => {
+                const btn = document.getElementById(`btn-${type}`);
+                if (type === choice) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
                 }
             });
-        });
 
-        // 算分與判定勝負
-        async function calculateAndReveal(room) {
-            const playerList = Object.values(room.players);
-            const choices = playerList.map(p => p.choice);
-            const uniqueChoices = [...new Set(choices)];
+            // Update choice in Firebase
+            playerRef.update({
+                choice: choice
+            });
+        }
 
-            let winners = []; // 得分者 ID 陣列
+        function toggleChoiceButtons(enabled) {
+            ['rock', 'scissors', 'paper'].forEach(type => {
+                const btn = document.getElementById(`btn-${type}`);
+                btn.disabled = !enabled;
+            });
+        }
 
-            if (uniqueChoices.length === 1 || uniqueChoices.length === 3) {
-                // 平手：全同或全不同 (三人時三種拳都有也是平手)
+        // Evaluate Winners (Supports 2 or 3 Players)
+        function evaluateRoundResults(players, roundNum) {
+            toggleChoiceButtons(false);
+            const playerIds = Object.keys(players);
+            const choices = playerIds.map(id => players[id].choice);
+
+            const iconMap = {
+                rock: '✊',
+                scissors: '✌️',
+                paper: '🖐️'
+            };
+
+            let winners = []; // array of playerIds
+            let isDraw = false;
+
+            if (playerIds.length === 2) {
+                // 2-Player Logic
+                const c1 = choices[0];
+                const c2 = choices[1];
+
+                if (c1 === c2) {
+                    isDraw = true;
+                } else if (
+                    (c1 === 'rock' && c2 === 'scissors') ||
+                    (c1 === 'scissors' && c2 === 'paper') ||
+                    (c1 === 'paper' && c2 === 'rock')
+                ) {
+                    winners = [playerIds[0]];
+                } else {
+                    winners = [playerIds[1]];
+                }
+            } else if (playerIds.length === 3) {
+                // 3-Player Logic
+                const uniqueChoices = new Set(choices);
+
+                if (uniqueChoices.size === 1 || uniqueChoices.size === 3) {
+                    // All same or all different => Draw
+                    isDraw = true;
+                } else {
+                    // Exactly 2 unique choices (e.g., 2 Rocks & 1 Scissors)
+                    const choiceArr = Array.from(uniqueChoices);
+                    const winChoice = getWinningChoice(choiceArr[0], choiceArr[1]);
+
+                    playerIds.forEach(id => {
+                        if (players[id].choice === winChoice) {
+                            winners.push(id);
+                        }
+                    });
+                }
+            }
+
+            // Display Results
+            const resultBanner = document.getElementById('resultBanner');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+
+            resultBanner.classList.remove('hidden');
+
+            let descText = playerIds.map(id => `${escapeHtml(players[id].name)} (${iconMap[players[id].choice]})`).join(' VS ');
+
+            if (isDraw) {
                 resultTitle.innerText = "🤝 平手！";
-                resultDetail.innerText = "大家實力相當，不分勝負！";
+                resultTitle.className = "text-2xl font-black mb-1 text-amber-300 glow-text";
             } else {
-                // 兩種拳的情況：判斷誰贏
-                let winningChoice = '';
-                if (uniqueChoices.includes('rock') && uniqueChoices.includes('scissors')) winningChoice = 'rock';
-                if (uniqueChoices.includes('scissors') && uniqueChoices.includes('paper')) winningChoice = 'scissors';
-                if (uniqueChoices.includes('paper') && uniqueChoices.includes('rock')) winningChoice = 'paper';
-
-                const winningPlayers = playerList.filter(p => p.choice === winningChoice);
-                winners = winningPlayers.map(p => p.id);
-
-                const winnerNames = winningPlayers.map(p => p.name).join(' & ');
-                resultTitle.innerText = `🎉 ${winnerNames} 獲勝！`;
-                resultDetail.innerText = `以 ${getChoiceName(winningChoice)} 贏得了本局！`;
-
-                // 播放特效
-                if (winners.includes(myPlayerId)) {
-                    triggerConfetti();
-                }
-            }
-
-            // 更新分數與狀態至 Firebase (僅由房主或任一觸發者寫入一次)
-            const updates = {};
-            updates[`rooms/${currentRoomId}/status`] = 'revealed';
-            
-            playerList.forEach(p => {
-                if (winners.includes(p.id)) {
-                    updates[`rooms/${currentRoomId}/players/${p.id}/score`] = (p.score || 0) + 1;
-                }
-            });
-
-            await update(ref(db), updates);
-        }
-
-        function getChoiceName(choice) {
-            if (choice === 'rock') return '✊ 石頭';
-            if (choice === 'scissors') return '✌️ 剪刀';
-            if (choice === 'paper') return '🖐️ 布';
-            return '';
-        }
-
-        function resetChoiceUI() {
-            document.querySelectorAll('.btn-choice').forEach(b => b.classList.remove('selected'));
-        }
-
-        // 下一局
-        btnNextRound.addEventListener('click', async () => {
-            if (!currentRoomId) return;
-
-            const snapshot = await get(ref(db, `rooms/${currentRoomId}`));
-            if (!snapshot.exists()) return;
-
-            const room = snapshot.val();
-            const nextRound = (room.round || 1) + 1;
-
-            const updates = {};
-            updates[`rooms/${currentRoomId}/status`] = 'waiting';
-            updates[`rooms/${currentRoomId}/round`] = nextRound;
-
-            Object.keys(room.players || {}).forEach(pid => {
-                updates[`rooms/${currentRoomId}/players/${pid}/choice`] = '';
-            });
-
-            resetChoiceUI();
-            await update(ref(db), updates);
-        });
-
-        // 簡單 Canvas 彩帶慶祝特效
-        function triggerConfetti() {
-            const canvas = document.getElementById('canvas-fx');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            const colors = ['#0284c7', '#38bdf8', '#7dd3fc', '#f0f9ff', '#3b82f6'];
-
-            for (let i = 0; i < 60; i++) {
-                particles.push({
-                    x: canvas.width / 2,
-                    y: canvas.height / 2,
-                    vx: (Math.random() - 0.5) * 12,
-                    vy: (Math.random() - 0.7) * 12,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    radius: Math.random() * 6 + 3,
-                    alpha: 1
-                });
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let active = false;
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.2; // 重力
-                    p.alpha -= 0.015;
-
-                    if (p.alpha > 0) {
-                        active = true;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = p.color;
-                        ctx.globalAlpha = Math.max(0, p.alpha);
-                        ctx.fill();
-                    }
-                });
-
-                if (active) {
-                    requestAnimationFrame(animate);
+                const winnerNames = winners.map(id => escapeHtml(players[id].name)).join(' & ');
+                if (winners.includes(playerId)) {
+                    resultTitle.innerText = winners.length > 1 ? "🎉 你與盟友獲勝！" : "🏆 你贏了！";
+                    resultTitle.className = "text-2xl font-black mb-1 text-emerald-300 glow-text";
                 } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    resultTitle.innerText = `🎉 ${winnerNames} 勝出！`;
+                    resultTitle.className = "text-2xl font-black mb-1 text-cyan-300 glow-text";
                 }
             }
 
-            animate();
+            resultDesc.innerText = descText;
+
+            // Show Next Round Button (Host or any player can trigger)
+            const nextBtn = document.getElementById('nextRoundBtn');
+            nextBtn.classList.remove('hidden');
+
+            // Synchronize score updates (only handled once per round)
+            if (!roomRef) return;
+            roomRef.child('lastEvaluatedRound').transaction(lastRound => {
+                if (lastRound !== roundNum) {
+                    // Update scores in Firebase
+                    if (!isDraw && winners.length > 0) {
+                        winners.forEach(wId => {
+                            const currentScore = players[wId].score || 0;
+                            db.ref(`rooms/${currentRoomCode}/players/${wId}/score`).set(currentScore + 1);
+                        });
+                    }
+                    return roundNum;
+                }
+                return undefined;
+            });
+        }
+
+        function getWinningChoice(a, b) {
+            if ((a === 'rock' && b === 'scissors') || (b === 'rock' && a === 'scissors')) return 'rock';
+            if ((a === 'scissors' && b === 'paper') || (b === 'scissors' && a === 'paper')) return 'scissors';
+            return 'paper';
+        }
+
+        // Reset for Next Round
+        function resetRound() {
+            if (!roomRef || !currentRoomCode) return;
+
+            // Clear selected styling
+            ['rock', 'scissors', 'paper'].forEach(type => {
+                document.getElementById(`btn-${type}`).classList.remove('selected');
+            });
+
+            roomRef.once('value').then(snapshot => {
+                const room = snapshot.val();
+                const nextRound = (room.round || 1) + 1;
+                const players = room.players || {};
+
+                // Reset player choices
+                const updates = {};
+                updates[`rooms/${currentRoomCode}/round`] = nextRound;
+                Object.keys(players).forEach(id => {
+                    updates[`rooms/${currentRoomCode}/players/${id}/choice`] = null;
+                });
+
+                db.ref().update(updates);
+            });
+        }
+
+        // Utility Functions
+        function copyRoomCode() {
+            if (!currentRoomCode) return;
+            const tempInput = document.createElement('input');
+            tempInput.value = currentRoomCode;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("房號已複製到剪貼簿！");
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
         }
     </script>
 </body>
 </html>
-'''
-
-with open('index.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print("File index.html generated successfully.")
