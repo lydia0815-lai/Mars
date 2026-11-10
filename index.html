@@ -148,9 +148,9 @@
                 <a href="#games" class="px-4 py-2 neu-btn font-semibold text-amber-700 hover:text-amber-600 flex items-center gap-1.5">
                     <i class="fa-solid fa-gamepad text-amber-600"></i> 小遊戲專區
                 </a>
-                <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
-                    News <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
-                </span>
+                <a href="#news" class="px-4 py-2 neu-btn text-amber-900 hover:text-amber-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-newspaper text-amber-600"></i> 最新消息
+                </a>
                 <span class="px-4 py-2 neu-inset text-stone-400 cursor-not-allowed text-xs flex items-center gap-1.5">
                     Tools <span class="bg-stone-300 text-stone-600 px-1.5 py-0.5 rounded-full text-[10px]">Coming soon</span>
                 </span>
@@ -167,7 +167,9 @@
             <a href="#games" class="px-3 py-1.5 neu-btn text-amber-700 font-semibold flex items-center gap-1">
                 <i class="fa-solid fa-gamepad text-amber-600"></i> 小遊戲專區
             </a>
-            <span class="px-2.5 py-1.5 neu-inset text-stone-400">News <span class="text-[9px] opacity-75">Soon</span></span>
+            <a href="#news" class="px-3 py-1.5 neu-btn text-amber-900 flex items-center gap-1">
+                <i class="fa-solid fa-newspaper text-amber-600"></i> 最新消息
+            </a>
             <span class="px-2.5 py-1.5 neu-inset text-stone-400">Tools <span class="text-[9px] opacity-75">Soon</span></span>
         </div>
     </header>
@@ -179,7 +181,7 @@
             <!-- Personal Photo Image Frame -->
             <div class="flex-shrink-0">
                 <div class="neu-photo-badge w-36 h-36 md:w-44 md:h-44 p-2.5 border border-white/60 overflow-hidden rounded-[28px]">
-                    <IMG src="IMG_7803.JPG" alt="賴姵璇" class="w-full h-full object-cover rounded-[22px]">
+                    <img src="IMG_7803.JPG" alt="賴姵璇" class="w-full h-full object-cover rounded-[22px]">
                 </div>
             </div>
 
@@ -219,6 +221,25 @@
                 <p class="text-stone-700 leading-relaxed text-base md:text-lg tracking-wide">
                     賴姵璇，目前就讀大同大學事業經營學系，自2023年入學，預計於2027年7月畢業。曾於建設公司擔任接待禮賓人員，也曾在補習班擔任櫃檯。暑期曾至地政業實習，主要接觸行政與文書處理。平時使用Word、Canva及PowerPoint處理課業與工作內容。個性樂觀、懂得變通，也重視細節。課餘時間喜歡跑步，作為日常生活中的興趣。
                 </p>
+            </div>
+        </section>
+
+        <!-- Google News Section -->
+        <section id="news" class="space-y-6 pt-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-8 bg-amber-600 rounded-full neu-card-sm"></div>
+                    <div>
+                        <h2 class="text-xl font-bold text-stone-800">最新消息</h2>
+                        <p class="text-xs text-stone-500 mt-0.5">自動同步 Google 快訊動態</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="neu-card p-6 md:p-8">
+                <div id="news-container" class="space-y-4">
+                    <p class="text-stone-500 text-sm text-center py-4">正在載入最新消息...</p>
+                </div>
             </div>
         </section>
 
@@ -446,8 +467,9 @@
         </div>
     </div>
 
-    <!-- Modal Toggle Script -->
+    <!-- Scripts -->
     <script>
+        // Modal Toggle Script
         function toggleContactModal() {
             const modal = document.getElementById('contactModal');
             modal.classList.toggle('hidden');
@@ -474,6 +496,43 @@
                 toggleContactModal();
             }
         }
+
+        // Fetch and Render Google News from news.json
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('news.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('news-container');
+                    if (!data || data.length === 0) {
+                        container.innerHTML = '<p class="text-stone-500 text-sm text-center py-4">目前沒有最新消息。</p>';
+                        return;
+                    }
+
+                    let html = '<div class="divide-y divide-stone-300/40">';
+                    data.forEach(item => {
+                        const dateStr = item.published ? new Date(item.published).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '';
+                        html += `
+                            <div class="py-3.5 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+                                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-stone-800 hover:text-amber-600 font-medium text-sm md:text-base transition-colors line-clamp-1 flex items-center gap-2">
+                                    <i class="fa-solid fa-angle-right text-amber-600 text-xs"></i> ${item.title}
+                                </a>
+                                ${dateStr ? `<span class="text-xs text-stone-400 whitespace-nowrap pl-4 sm:pl-0">${dateStr}</span>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                })
+                .catch(error => {
+                    const container = document.getElementById('news-container');
+                    container.innerHTML = '<p class="text-stone-500 text-sm text-center py-4">目前暫無新聞動態，請稍候再試。</p>';
+                });
+        });
     </script>
 </body>
 </html>
