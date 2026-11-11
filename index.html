@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- 基本 SEO 標籤 -->
+    <!-- 基本 SEO 標籤與 Google 搜尋結果最佳化 -->
     <title>大同大學事經系大四生 賴姵璇 的個人作品集 | 記錄 AI 應用學習過程與各項實作專案成果</title>
     <meta name="description" content="大同大學事經系大四生 賴姵璇 的個人作品集，記錄 AI 應用學習過程與各項實作專案成果。">
     
-    <!-- Favicon 小圖示與手機主畫面圖示 -->
+    <!-- 瀏覽器分頁與手機主畫面圖示 -->
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
 
-    <!-- Open Graph / Facebook / LINE 社群分享標籤 -->
+    <!-- Open Graph / Facebook / LINE 社群分享預覽設定 -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="大同大學事經系大四生 賴姵璇 的個人作品集">
     <meta property="og:description" content="大同大學事經系大四生 賴姵璇 的個人作品集，記錄 AI 應用學習過程與各項實作專案成果。">
@@ -214,20 +214,20 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-stone-800 tracking-tight">
                     賴姵璇
                 </h1>
-                <!-- 一句話定位 -->
+                <!-- 一句話定位（網站名稱下方） -->
                 <p class="text-base md:text-lg text-stone-600 font-medium leading-relaxed">
                     大同大學事經系大四生 賴姵璇 的個人作品集，記錄 AI 應用學習過程與各項實作專案成果。
                 </p>
 
-                <!-- 社群分享按鈕區塊 -->
+                <!-- 三個分享按鈕區塊（LINE、Facebook、手機系統分享 / 電腦複製網址） -->
                 <div class="pt-1 flex flex-wrap justify-center md:justify-start items-center gap-2">
-                    <button onclick="shareToLine()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5">
+                    <button onclick="shareToLine()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5" title="分享到 LINE">
                         <i class="fa-brands fa-line text-sm text-emerald-600"></i> LINE 分享
                     </button>
-                    <button onclick="shareToFacebook()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1.5">
+                    <button onclick="shareToFacebook()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1.5" title="分享到 Facebook">
                         <i class="fa-brands fa-facebook text-sm text-blue-600"></i> FB 分享
                     </button>
-                    <button onclick="nativeOrCopyShare()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-amber-800 hover:text-amber-900 flex items-center gap-1.5">
+                    <button onclick="nativeOrCopyShare()" class="px-3 py-1.5 neu-btn text-xs font-semibold text-amber-800 hover:text-amber-900 flex items-center gap-1.5" title="手機系統分享 / 電腦複製網址">
                         <i class="fa-solid fa-share-nodes text-sm text-amber-600"></i> 分享網站
                     </button>
                     <span id="shareToast" class="hidden text-xs text-amber-700 font-medium pl-1">已複製網址！</span>
