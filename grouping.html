@@ -17,7 +17,8 @@
   <meta property="og:title" content="線上抽籤與隨機分組工具｜快速名單分配" />
   <meta property="og:description" content="輸入名單即可一鍵完成公平抽籤與隨機分組的免費線上小工具，支援自訂組數與一鍵複製結果。" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="./og.jpg" />
+  <!-- 提醒：請將 1200 x 630 px 的分享封面圖存為 og-cover.png 放在同資料夾（若使用現有的 og.jpg 請將下方路徑改為 ./og.jpg） -->
+  <meta property="og:image" content="./og-cover.png" />
 
   <!-- 5. Google Analytics (GA4) 追蹤碼 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z5D344VKHP"></script>
@@ -840,6 +841,7 @@
       if (method === 'byGroupCount') {
         const groupCount = Math.min(numVal, shuffled.length);
         groups = Array.from({ length: groupCount }, () => []);
+        // 輪流發牌式平均分配，確保每組人數差距不超過 1 人
         shuffled.forEach((person, idx) => {
           groups[idx % groupCount].push(person);
         });
@@ -847,6 +849,7 @@
         const perGroup = numVal;
         const groupCount = Math.ceil(shuffled.length / perGroup);
         groups = Array.from({ length: groupCount }, () => []);
+        // 依計算出的組數進行輪流平均分配，避免最後一組只剩 1 人
         shuffled.forEach((person, idx) => {
           groups[idx % groupCount].push(person);
         });
@@ -908,6 +911,7 @@
         return;
       }
 
+      // 計算中獎名單
       let winners = [];
       if (allowDuplicate) {
         for (let i = 0; i < winnerCount; i++) {
@@ -919,6 +923,7 @@
         winners = shuffled.slice(0, winnerCount);
       }
 
+      // 啟動動態滾動揭曉動畫
       isRolling = true;
       btnRunLottery.disabled = true;
       btnRerun.disabled = true;
@@ -1006,6 +1011,7 @@
           btnCopy.classList.remove('btn-copy-success');
         }, 2000);
       } catch (err) {
+        // 備用複製方式
         const tempArea = document.createElement('textarea');
         tempArea.value = latestFormattedText;
         document.body.appendChild(tempArea);
