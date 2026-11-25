@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- 1. 網頁標題 -->
+  <title>線上抽籤與隨機分組工具｜快速名單分配</title>
+
+  <!-- 2. 分頁小圖示 (favicon) -->
+  <!-- 提醒：若你上傳的是 favicon.jpg，請將下方 href 修改為 "./favicon.jpg" -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png" />
+
+  <!-- 3. 網頁描述 (meta description) -->
+  <meta name="description" content="輸入名單即可一鍵完成公平抽籤與隨機分組的免費線上小工具，支援自訂組數與一鍵複製結果。" />
+
+  <!-- 4. 社群分享卡 (Open Graph / og 標籤) -->
+  <meta property="og:title" content="線上抽籤與隨機分組工具｜快速名單分配" />
+  <meta property="og:description" content="輸入名單即可一鍵完成公平抽籤與隨機分組的免費線上小工具，支援自訂組數與一鍵複製結果。" />
+  <meta property="og:type" content="website" />
+  <!-- 提醒：請將 1200x630 的分享封面圖存為 og-cover.png 放在同資料夾（或替換為你現有的 og.jpg 路徑） -->
+  <meta property="og:image" content="./og-cover.png" />
+
+  <!-- 5. Google Analytics (GA4) 追蹤碼 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z5D344VKHP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Z5D344VKHP');
+  </script>
+
+  <style>
+    :root {
+      --bg-cream: #FAF6F0;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #F4ECE1;
+      --primary: #D97736;
+      --primary-hover: #C06224;
+      --primary-light: #FCEEE3;
+      --accent-earth: #8C6D53;
+      --text-main: #3A2E25;
+      --text-muted: #78695C;
+      --border-soft: #E8DDD0;
+      --success: #3E8E63;
+      --shadow-sm: 0 2px 8px rgba(58, 46, 37, 0.05);
+      --shadow-md: 0 8px 24px rgba(58, 46, 37, 0.08);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* 頂部導覽列 */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: var(--accent-earth);
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+      transform: translateX(-2px);
+    }
+
+    /* 頁首標題區 */
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* 卡片共用樣式 */
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+    }
+
+    .badge-count {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    /* 名單輸入區 */
+    .input-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-chip {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border-soft);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-chip:hover {
+      background-color: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 14px;
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text-main);
+      background-color: #FFFDFB;
+      resize: vertical;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(217, 119, 54, 0.15);
+    }
+
+    .input-hint {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* 模式切換標籤 */
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background-color: var(--bg-subtle);
+      padding: 6px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background-color: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 控制參數列 */
+    .control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+
+    .radio-label:has(input:checked) {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .radio-label input {
+      accent-color: var(--primary);
+      width: 17px;
+      height: 17px;
+    }
+
+    .number-input-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    input[type="number"] {
+      width: 84px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-main);
+      background-color: #FFFDFB;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* 開關 Switch */
+    .switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 8px 0;
+    }
+
+    .switch-wrap input {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* 主要執行按鈕 */
+    .btn-primary {
+      width: 100%;
+      padding: 15px 24px;
+      margin-top: 8px;
+      background-color: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(217, 119, 54, 0.28);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 錯誤提示 */
+    .error-msg {
+      display: none;
+      background-color: #FDECEA;
+      color: #B73A2E;
+      border: 1px solid #F5C2BC;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    /* 結果展示區 */
+    .result-section {
+      display: none;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border-soft);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .btn-copy-success {
+      border-color: var(--success) !important;
+      background-color: #EAF6EF !important;
+      color: var(--success) !important;
+    }
+
+    /* 分組卡片網格 */
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .group-card {
+      background-color: #FFFDFB;
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .group-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1.5px dashed var(--border-soft);
+    }
+
+    .group-title {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+
+    .group-size {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background-color: var(--bg-subtle);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .member-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .member-list li {
+      padding: 6px 10px;
+      background-color: var(--bg-cream);
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.98rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .member-index {
+      font-size: 0.8rem;
+      color: var(--accent-earth);
+      font-weight: 700;
+      min-width: 18px;
+    }
+
+    /* 抽籤揭曉區 */
+    .lottery-stage {
+      margin-top: 16px;
+      padding: 24px 16px;
+      background: linear-gradient(135deg, #FFF9F2 0%, #FCEEE3 100%);
+      border: 1.5px solid #F2D3BC;
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .rolling-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      padding: 16px;
+      letter-spacing: 1px;
+      animation: pulse 0.35s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(0.97); opacity: 0.75; }
+      to { transform: scale(1.03); opacity: 1; }
+    }
+
+    .winners-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .winner-badge {
+      background-color: var(--bg-card);
+      border: 2px solid var(--primary);
+      color: var(--text-main);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 1.15rem;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .winner-rank {
+      background-color: var(--primary);
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    /* 手機版響應式微調 */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .card {
+        padding: 18px 16px;
+      }
+
+      .groups-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-actions {
+        width: 100%;
+      }
+
+      .btn-action {
+        flex: 1;
+        min-height: 46px;
+      }
+
+      .btn-primary {
+        min-height: 52px;
+      }
+
+      .radio-label {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 導覽列 -->
+    <nav class="top-nav">
+      <a href="./index.html" class="btn-back">← 回首頁</a>
+    </nav>
+
+    <!-- 頁首 -->
+    <header>
+      <h1>🎲 線上抽籤與隨機分組工具</h1>
+      <p>輸入名單即可快速完成公平抽籤與平均分組，一鍵複製分享到群組</p>
+    </header>
+
+    <!-- 1. 名單輸入區 -->
+    <section class="card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>📋 參與名單</span>
+          <span class="badge-count" id="totalCountBadge">目前共 0 人</span>
+        </div>
+        <div class="input-actions">
+          <button type="button" class="btn-chip" id="btnSample">載入範例名單</button>
+          <button type="button" class="btn-chip" id="btnClear">清空</button>
+        </div>
+      </div>
+
+      <textarea
+        id="nameInput"
+        placeholder="請輸入名單，可使用「換行」或「逗號」分隔&#10;例如：&#10;王小明&#10;陳小華&#10;林美玲, 張志豪"
+      ></textarea>
+      <p class="input-hint">💡 支援換行、半形逗號 (,) 與全形逗號 (，)，系統會自動過濾空白項目。</p>
+    </section>
+
+    <!-- 2. 模式切換與設定區 -->
+    <section class="card">
+      <div class="mode-tabs" role="tablist">
+        <button type="button" class="tab-btn active" id="tabGrouping" role="tab" aria-selected="true">
+          👥 隨機分組模式
+        </button>
+        <button type="button" class="tab-btn" id="tabLottery" role="tab" aria-selected="false">
+          🎉 幸運抽籤模式
+        </button>
+      </div>
+
+      <!-- 隨機分組設定面板 -->
+      <div id="panelGrouping" class="control-panel">
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="groupMethod" value="byGroupCount" checked />
+            <span>依「分成幾組」平均分配</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="groupMethod" value="byGroupSize" />
+            <span>依「每組幾人」自動拆組</span>
+          </label>
+        </div>
+
+        <div class="control-row">
+          <label class="number-input-wrap" for="groupNumberInput">
+            <span id="groupNumberLabel">預計分成：</span>
+            <input type="number" id="groupNumberInput" min="1" max="500" value="3" />
+            <span id="groupNumberUnit">組</span>
+          </label>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnRunGrouping">✨ 開始隨機分組</button>
+      </div>
+
+      <!-- 幸運抽籤設定面板 -->
+      <div id="panelLottery" class="control-panel hidden">
+        <div class="control-row">
+          <label class="number-input-wrap" for="winnerCountInput">
+            <span>抽出幾位中獎者：</span>
+            <input type="number" id="winnerCountInput" min="1" max="500" value="1" />
+            <span>位</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="switch-wrap">
+            <input type="checkbox" id="allowDuplicateCheckbox" />
+            <span>允許同一人重複抽中</span>
+          </label>
+        </div>
+
+        <button type="button" class="btn-primary" id="btnRunLottery">🎰 開始幸運抽籤</button>
+      </div>
+
+      <div id="errorBox" class="error-msg" role="alert"></div>
+    </section>
+
+    <!-- 3. 結果顯示與操作區 -->
+    <section class="card result-section" id="resultSection">
+      <div class="section-header">
+        <div class="section-title" id="resultTitle">📊 分配結果</div>
+        <div class="result-actions">
+          <button type="button" class="btn-action" id="btnRerun">🔄 重新洗牌／再抽一次</button>
+          <button type="button" class="btn-action" id="btnCopy">📋 一鍵複製結果</button>
+        </div>
+      </div>
+
+      <div id="resultContainer"></div>
+    </section>
+
+    <footer>
+      <p>© 2026 賴姵璇｜個人作品集小工具</p>
+    </footer>
+  </div>
+
+  <script>
+    // DOM 元素參照
+    const nameInput = document.getElementById('nameInput');
+    const totalCountBadge = document.getElementById('totalCountBadge');
+    const btnSample = document.getElementById('btnSample');
+    const btnClear = document.getElementById('btnClear');
+
+    const tabGrouping = document.getElementById('tabGrouping');
+    const tabLottery = document.getElementById('tabLottery');
+    const panelGrouping = document.getElementById('panelGrouping');
+    const panelLottery = document.getElementById('panelLottery');
+
+    const groupMethodRadios = document.querySelectorAll('input[name="groupMethod"]');
+    const groupNumberLabel = document.getElementById('groupNumberLabel');
+    const groupNumberInput = document.getElementById('groupNumberInput');
+    const groupNumberUnit = document.getElementById('groupNumberUnit');
+    const btnRunGrouping = document.getElementById('btnRunGrouping');
+
+    const winnerCountInput = document.getElementById('winnerCountInput');
+    const allowDuplicateCheckbox = document.getElementById('allowDuplicateCheckbox');
+    const btnRunLottery = document.getElementById('btnRunLottery');
+
+    const errorBox = document.getElementById('errorBox');
+    const resultSection = document.getElementById('resultSection');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultContainer = document.getElementById('resultContainer');
+    const btnRerun = document.getElementById('btnRerun');
+    const btnCopy = document.getElementById('btnCopy');
+
+    let currentMode = 'grouping'; // 'grouping' | 'lottery'
+    let latestFormattedText = '';
+    let isRolling = false;
+
+    // 解析名單（支援換行、半形與全形逗號）
+    function parseNames() {
+      const raw = nameInput.value;
+      return raw
+        .split(/[\n,，]+/)
+        .map(name => name.trim())
+        .filter(name => name.length > 0);
+    }
+
+    // 即時更新人數統計
+    function updateCount() {
+      const names = parseNames();
+      totalCountBadge.textContent = `目前共 ${names.length} 人`;
+    }
+
+    nameInput.addEventListener('input', () => {
+      updateCount();
+      hideError();
+    });
+
+    // 載入範例名單
+    btnSample.addEventListener('click', () => {
+      const sampleNames = [
+        '賴姵璇', '陳冠宇', '林佳穎', '黃柏翰',
+        '張雅婷', '李宗翰', '王怡君', '吳承恩',
+        '蔡佩珊', '鄭宇軒', '許詩涵', '楊子豪'
+      ];
+      nameInput.value = sampleNames.join('\n');
+      updateCount();
+      hideError();
+    });
+
+    // 清空名單
+    btnClear.addEventListener('click', () => {
+      nameInput.value = '';
+      updateCount();
+      hideError();
+      resultSection.style.display = 'none';
+    });
+
+    // 切換模式
+    function switchMode(mode) {
+      if (isRolling) return;
+      currentMode = mode;
+      hideError();
+
+      if (mode === 'grouping') {
+        tabGrouping.classList.add('active');
+        tabGrouping.setAttribute('aria-selected', 'true');
+        tabLottery.classList.remove('active');
+        tabLottery.setAttribute('aria-selected', 'false');
+        panelGrouping.classList.remove('hidden');
+        panelLottery.classList.add('hidden');
+      } else {
+        tabLottery.classList.add('active');
+        tabLottery.setAttribute('aria-selected', 'true');
+        tabGrouping.classList.remove('active');
+        tabGrouping.setAttribute('aria-selected', 'false');
+        panelLottery.classList.remove('hidden');
+        panelGrouping.classList.add('hidden');
+      }
+    }
+
+    tabGrouping.addEventListener('click', () => switchMode('grouping'));
+    tabLottery.addEventListener('click', () => switchMode('lottery'));
+
+    // 分組方式標籤連動
+    groupMethodRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.value === 'byGroupCount') {
+          groupNumberLabel.textContent = '預計分成：';
+          groupNumberUnit.textContent = '組';
+        } else {
+          groupNumberLabel.textContent = '每組上限：';
+          groupNumberUnit.textContent = '人';
+        }
+      });
+    });
+
+    // Fisher-Yates 公平洗牌演算法
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function showError(msg) {
+      errorBox.textContent = `⚠️ ${msg}`;
+      errorBox.style.display = 'block';
+    }
+
+    function hideError() {
+      errorBox.style.display = 'none';
+    }
+
+    // 執行隨機分組
+    function runGrouping() {
+      hideError();
+      const names = parseNames();
+      if (names.length < 2) {
+        showError('請至少輸入 2 位成員名單再進行分組！');
+        return;
+      }
+
+      const method = document.querySelector('input[name="groupMethod"]:checked').value;
+      const numVal = parseInt(groupNumberInput.value, 10);
+
+      if (isNaN(numVal) || numVal < 1) {
+        showError('請輸入大於 0 的有效數字！');
+        return;
+      }
+
+      const shuffled = shuffleArray(names);
+      let groups = [];
+
+      if (method === 'byGroupCount') {
+        const groupCount = Math.min(numVal, shuffled.length);
+        groups = Array.from({ length: groupCount }, () => []);
+        // 輪流發牌式平均分配，確保每組人數差距不超過 1 人
+        shuffled.forEach((person, idx) => {
+          groups[idx % groupCount].push(person);
+        });
+      } else {
+        const perGroup = numVal;
+        const groupCount = Math.ceil(shuffled.length / perGroup);
+        groups = Array.from({ length: groupCount }, () => []);
+        // 依計算出的組數進行輪流平均分配，避免最後一組只剩 1 人
+        shuffled.forEach((person, idx) => {
+          groups[idx % groupCount].push(person);
+        });
+      }
+
+      renderGroupingResult(groups);
+    }
+
+    function renderGroupingResult(groups) {
+      resultTitle.textContent = `👥 隨機分組結果（共 ${groups.length} 組）`;
+      let html = '<div class="groups-grid">';
+      let copyLines = [`【隨機分組結果｜共 ${groups.length} 組】`];
+
+      groups.forEach((members, index) => {
+        const groupNum = index + 1;
+        copyLines.push(`\n第 ${groupNum} 組（${members.length}人）：${members.join('、')}`);
+
+        html += `
+          <div class="group-card">
+            <div class="group-card-header">
+              <span class="group-title">第 ${groupNum} 組</span>
+              <span class="group-size">${members.length} 人</span>
+            </div>
+            <ul class="member-list">
+              ${members.map((m, i) => `<li><span class="member-index">${i + 1}.</span><span>${escapeHtml(m)}</span></li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      latestFormattedText = copyLines.join('\n');
+      resultContainer.innerHTML = html;
+      resultSection.style.display = 'block';
+      resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 執行幸運抽籤（含滾動揭曉動畫）
+    function runLottery() {
+      if (isRolling) return;
+      hideError();
+
+      const names = parseNames();
+      if (names.length < 1) {
+        showError('請先輸入名單再進行抽籤！');
+        return;
+      }
+
+      const winnerCount = parseInt(winnerCountInput.value, 10);
+      const allowDuplicate = allowDuplicateCheckbox.checked;
+
+      if (isNaN(winnerCount) || winnerCount < 1) {
+        showError('請輸入至少 1 位中獎人數！');
+        return;
+      }
+
+      if (!allowDuplicate && winnerCount > names.length) {
+        showError(`目前名單只有 ${names.length} 人，不重複抽籤最多只能抽出 ${names.length} 位！`);
+        return;
+      }
+
+      // 計算中獎名單
+      let winners = [];
+      if (allowDuplicate) {
+        for (let i = 0; i < winnerCount; i++) {
+          const randomIdx = Math.floor(Math.random() * names.length);
+          winners.push(names[randomIdx]);
+        }
+      } else {
+        const shuffled = shuffleArray(names);
+        winners = shuffled.slice(0, winnerCount);
+      }
+
+      // 啟動動態滾動揭曉動畫
+      isRolling = true;
+      btnRunLottery.disabled = true;
+      btnRerun.disabled = true;
+
+      resultTitle.textContent = '🎰 抽籤進行中...';
+      resultSection.style.display = 'block';
+      resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      resultContainer.innerHTML = `
+        <div class="lottery-stage">
+          <div class="rolling-text" id="rollingDisplay">🎲 正在洗牌抽籤...</div>
+        </div>
+      `;
+
+      const rollingDisplay = document.getElementById('rollingDisplay');
+      let ticks = 0;
+      const maxTicks = 16;
+
+      const interval = setInterval(() => {
+        const randomPreview = names[Math.floor(Math.random() * names.length)];
+        rollingDisplay.textContent = `✨ ${escapeHtml(randomPreview)} ✨`;
+        ticks++;
+
+        if (ticks >= maxTicks) {
+          clearInterval(interval);
+          isRolling = false;
+          btnRunLottery.disabled = false;
+          btnRerun.disabled = false;
+          renderLotteryResult(winners);
+        }
+      }, 65);
+    }
+
+    function renderLotteryResult(winners) {
+      resultTitle.textContent = `🎉 恭喜以下 ${winners.length} 位中獎者`;
+      let copyLines = [`【幸運抽籤結果｜共 ${winners.length} 位】`];
+
+      const badgesHtml = winners.map((winner, index) => {
+        const rank = index + 1;
+        copyLines.push(`${rank}. ${winner}`);
+        return `
+          <div class="winner-badge" style="animation-delay: ${index * 0.06}s">
+            <span class="winner-rank">#${rank}</span>
+            <span>${escapeHtml(winner)}</span>
+          </div>
+        `;
+      }).join('');
+
+      latestFormattedText = copyLines.join('\n');
+      resultContainer.innerHTML = `
+        <div class="lottery-stage">
+          <div class="winners-list">${badgesHtml}</div>
+        </div>
+      `;
+    }
+
+    // 防止 XSS 跳脫字元
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // 綁定執行與重抽按鈕
+    btnRunGrouping.addEventListener('click', runGrouping);
+    btnRunLottery.addEventListener('click', runLottery);
+    btnRerun.addEventListener('click', () => {
+      if (currentMode === 'grouping') {
+        runGrouping();
+      } else {
+        runLottery();
+      }
+    });
+
+    // 一鍵複製結果
+    btnCopy.addEventListener('click', async () => {
+      if (!latestFormattedText) return;
+      try {
+        await navigator.clipboard.writeText(latestFormattedText);
+        const originalText = btnCopy.textContent;
+        btnCopy.textContent = '✅ 已複製到剪貼簿！';
+        btnCopy.classList.add('btn-copy-success');
+        setTimeout(() => {
+          btnCopy.textContent = originalText;
+          btnCopy.classList.remove('btn-copy-success');
+        }, 2000);
+      } catch (err) {
+        // 備用複製方式
+        const tempArea = document.createElement('textarea');
+        tempArea.value = latestFormattedText;
+        document.body.appendChild(tempArea);
+        tempArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempArea);
+        btnCopy.textContent = '✅ 已複製！';
+      }
+    });
+  </script>
+</body>
+</html>
